@@ -28,9 +28,13 @@ fabletools::accuracy
 #' @export
 fabletools::stream
 
-#' @importFrom fabletools stream
+#' @importFrom fabletools outliers
 #' @export
 fabletools::outliers
+
+#' @importFrom fabletools model_sum
+#' @export
+fabletools::model_sum
 
 # --- generics (verbs of the modelling framework) ----------------------------------
 
@@ -93,8 +97,3 @@ tsibble::yearquarter
 #' @importFrom tsibble new_data
 #' @export
 tsibble::new_data
-
-# Not re-exported on purpose:
-#  - fitted(), residuals(): stats generics, always available;
-#  - outliers(), generate(), hypothesize(): no method in this package yet
-#    (add `fabletools::outliers` etc. here when one is written).

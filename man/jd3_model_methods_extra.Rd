@@ -54,8 +54,7 @@
 
 \item{policy}{Refresh policy, a character string (see the functions above for
 the available policies; default \code{"Fixed"}: the estimated parameters are
-kept). \code{NULL} (\code{refit()} only) re-estimates the original specification on
-the new data.}
+kept).}
 
 \item{period, start, end}{additional parameters used to specify the span
 when \code{policy = "Current"} or \code{policy = "Outliers"} or \code{policy = "Outliers_StochasticComponent"}
@@ -135,9 +134,7 @@ mb_ext <- stream(mb_old, y_new)
 components(mb_ext)
 
 # refit(): apply the model to the full data
-refit(mb_old, y)                      # refresh policy "FreeParameters" (default)
-refit(mb_old, y, policy = NULL)       # specification re-estimated
-# other refresh policies: see ?rjd3x13::x13_refresh
+refit(mb_old, y)                      # refresh policy "Fixed" (default)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

@@ -16,13 +16,12 @@ backast(object, h, ...)
 \method{backast}{mdl_df}(object, h, ...)
 }
 \arguments{
-\item{object}{A fitted mable (\code{mdl_df}), a \code{mdl_ts} (e.g. \code{mb$x13[[1]]}) or
-a \code{jd3_model}.}
+\item{object}{A fitted \code{jd3_model} (usually a column of a mable).}
 
 \item{h}{Number of periods to backcast, immediately before the start of the
 series.}
 
-\item{...}{Currently unused.}
+\item{...}{Other arguments passed by \code{forecast()} (e.g. \code{times}), ignored.}
 }
 \value{
 For a \code{jd3_model} or a \code{mdl_ts}, a tsibble with the \code{n} dates
@@ -40,7 +39,7 @@ is built as for forecasts (log-normal for log-transformed series, normal
 otherwise; see the \emph{Distribution} section of \link{forecast.jd3_model}).
 }
 \examples{
-\dontshow{if (rjd3jars::check_java_version(silent = TRUE) ) withAutoprint(\{ # examplesIf}
+\dontshow{if (rjd3jars::check_java_version(silent = TRUE)) withAutoprint(\{ # examplesIf}
 y  <- tsibble::as_tsibble(AirPassengers)
 mb <- model(y, x13 = X13(value))
 

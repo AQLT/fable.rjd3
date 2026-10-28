@@ -7,8 +7,7 @@
 \method{forecast}{jd3_model}(object, new_data = NULL, ...)
 }
 \arguments{
-\item{object}{A fitted \code{jd3_model} (usually a column of a mable passed to
-\code{forecast()}).}
+\item{object}{A fitted \code{jd3_model} (usually a column of a mable).}
 
 \item{new_data}{A tsibble of future dates, built by \pkg{fabletools} from the
 horizon \code{h}. It must start right after the end of the series.}
@@ -41,7 +40,7 @@ JDemetra+'s forecast.
 }
 
 \examples{
-\dontshow{if (rjd3jars::check_java_version(silent = TRUE) ) withAutoprint(\{ # examplesIf}
+\dontshow{if (rjd3jars::check_java_version(silent = TRUE)) withAutoprint(\{ # examplesIf}
 y  <- tsibble::as_tsibble(AirPassengers)
 mb <- model(y, x13 = X13(value))
 

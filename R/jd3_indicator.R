@@ -19,7 +19,7 @@
 #' @param id Indicator id (see [jd3_dictionary()]).
 #' @param simplify For a mable only: simplify the result according to the type
 #'   of the indicator (see *Value*). `FALSE` always returns a list-column.
-#' @param ... Currently unused.
+#' @inheritParams jd3_model_methods
 #'
 #' @return For a `mdl_ts` or `jd3_model`, the indicator as returned by
 #'   [rjd3toolkit::result()]: a number, a string, a `ts`, a matrix, a
@@ -68,10 +68,6 @@ jd3_indicator.jd3_model <- function(object, id, drop = TRUE, ...) {
 #' @export
 jd3_indicator.mdl_ts <- function(object, id, drop = TRUE, ...) {
     jd3_indicator(jd3_model(object), id, drop = drop)
-}
-
-jd3_is_test <- function(v) {
-    inherits(v, "JD3_TEST")
 }
 
 #' @rdname jd3_indicator
@@ -124,11 +120,11 @@ jd3_indicator.mdl_df <- function(object, id, simplify = TRUE, drop = TRUE, ...) 
             return(out)
         }
         # tests
-        if (all(vapply(vals, jd3_is_test, logical(1)))) {
+        if (all(vapply(vals, inherits, logical(1), what = "JD3_TEST"))) {
             out <- do.call(rbind, lapply(items, head_cols))
             out$statistic <- vapply(vals, function(v) as.numeric(v$value),  numeric(1))
             out$p.value   <- vapply(vals, function(v) as.numeric(v$pvalue), numeric(1))
-            out$distribution   <- vapply(vals, function(v) attr(v, "distribution"), character(1))
+            out$distribution   <- vapply(vals, attr, character(1), which = "distribution")
             return(out)
         }
     }
@@ -138,21 +134,19 @@ jd3_indicator.mdl_df <- function(object, id, simplify = TRUE, drop = TRUE, ...) 
     out$value <- vals
     out
 }
-
+#' @keywords internal
+#' @noRd
 jd3_flatten <- function(v, name) {
     if (is.null(v)){
         NULL
     } else if (is.numeric(v) && is.null(dim(v)) && !is.ts(v) && length(v) == 1L) {
         return(setNames(list(as.numeric(v)), name))
-    } else if (jd3_is_test(v)) {
+    } else if (inherits(v, "JD3_TEST")) {
         # JD3_TEST: value and pvalue (CHECK)
         return(setNames(list(as.numeric(v$value), as.numeric(v$pvalue)),
                                paste0(name, c("_stat", "_pvalue"))))
     } else if (is.character(v) && length(v) == 1L){
         return(setNames(list(v), name))
-
-        return(setNames(c(as.numeric(v$value), as.numeric(v$pvalue)),
-                               paste0(name, c("_stat", "_pvalue"))))
     } else {
         # series, matrices
         setNames(list(NA_real_), name)
@@ -191,11 +185,10 @@ glance.jd3_model <- function(x, ids = NULL, ...) {
 #' Wraps [rjd3toolkit::dictionary()] on the Java result of the model. The
 #' returned ids can be passed to [jd3_indicator()].
 #'
-#' @param object A fitted mable (`mdl_df`), a `mdl_ts` or a `jd3_model`. For a
-#'   mable, the dictionary of the first model is returned.
-#' @param ... Currently unused.
+#' @inheritParams jd3_indicator
 #'
 #' @return A character vector of indicator ids.
+#' For a mable, the dictionary of the first model is returned.
 #'
 #' @seealso [jd3_indicator()]
 #' @examplesIf rjd3jars::check_java_version(silent = TRUE)

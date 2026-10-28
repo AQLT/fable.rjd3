@@ -48,6 +48,8 @@
 # With u = exp(s^2) and v = (sd / exp(m))^2:  (u - 1) * u = v
 #   => u - 1 = 2v / (1 + sqrt(1 + 4v))   (numerically stable form)
 #   => s     = sqrt(log1p(u - 1))
+#' @keywords internal
+#' @noRd
 jd3_sdlog_from_sd <- function(sd, m) {
     v <- (sd / exp(m))^2
     sqrt(log1p(2 * v / (1 + sqrt(1 + 4 * v))))
@@ -72,8 +74,7 @@ jd3_sdlog_from_sd <- function(sd, m) {
 #' another summary, e.g. `point_forecast = list(.median = median)` to obtain
 #' JDemetra+'s forecast.
 #'
-#' @param object A fitted `jd3_model` (usually a column of a mable passed to
-#'   `forecast()`).
+#' @inheritParams jd3_model_methods_extra
 #' @param new_data A tsibble of future dates, built by \pkg{fabletools} from the
 #'   horizon `h`. It must start right after the end of the series.
 #' @param ... Other arguments passed by `forecast()` (e.g. `times`), ignored.
@@ -85,7 +86,7 @@ jd3_sdlog_from_sd <- function(sd, m) {
 #' @seealso [backast()], [X13()], [TRAMOSEATS()], [jd3_indicator()] to
 #'   extract the raw indicators (`y_f`, `y_ef`...).
 #'
-#' @examplesIf rjd3jars::check_java_version(silent = TRUE) 
+#' @examplesIf rjd3jars::check_java_version(silent = TRUE)
 #' y  <- tsibble::as_tsibble(AirPassengers)
 #' mb <- model(y, x13 = X13(value))
 #'
@@ -110,14 +111,14 @@ forecast.jd3_model <- function(object, new_data = NULL, ...) {
     se <- res_rjd[[2]]
     is_log <- res_rjd[[3]] == 1
 
-    # --- additive: normal distribution (mean = median = y_f) --------------------
-    if (!is_log) {
-        return(distributional::dist_normal(mu, se))
-    } else {
-        # --- log-transformed: log-normal, median = y_f ------------------------------
+    if (is_log) {
+        # log-transformed: log-normal, median = y_f
         lf    <- rjd3toolkit::result(jres, sprintf("l_f(%s)", h))
         sdlog <- jd3_sdlog_from_sd(se, lf)
         return(distributional::dist_lognormal(log(mu), sdlog))
+    } else {
+        # additive: normal distribution (mean = median = y_f)
+        return(distributional::dist_normal(mu, se))
     }
 }
 
@@ -130,11 +131,9 @@ forecast.jd3_model <- function(object, new_data = NULL, ...) {
 #' is built as for forecasts (log-normal for log-transformed series, normal
 #' otherwise; see the *Distribution* section of [forecast.jd3_model]).
 #'
-#' @param object A fitted mable (`mdl_df`), a `mdl_ts` (e.g. `mb$x13[[1]]`) or
-#'   a `jd3_model`.
+#' @inheritParams forecast.jd3_model
 #' @param h Number of periods to backcast, immediately before the start of the
 #'   series.
-#' @param ... Currently unused.
 #'
 #' @return For a `jd3_model` or a `mdl_ts`, a tsibble with the `n` dates
 #'   preceding the series and a distribution column `dist` (see
@@ -145,7 +144,7 @@ forecast.jd3_model <- function(object, new_data = NULL, ...) {
 #' @seealso [forecast.jd3_model], [jd3_indicator()] for the raw indicators (`y_b`,
 #'   `y_eb`...).
 #'
-#' @examplesIf rjd3jars::check_java_version(silent = TRUE) 
+#' @examplesIf rjd3jars::check_java_version(silent = TRUE)
 #' y  <- tsibble::as_tsibble(AirPassengers)
 #' mb <- model(y, x13 = X13(value))
 #'
@@ -174,14 +173,14 @@ backast.jd3_model <- function(object, h, ...) {
     se <- res_rjd[[2]]
     is_log <- res_rjd[[3]] == 1
 
-    # --- additive: normal distribution (mean = median = y_f) --------------------
-    if (!is_log) {
-        dist <- distributional::dist_normal(mu, se)
-    } else {
-        # --- log-transformed: log-normal, median = y_f ------------------------------
+    if (is_log) {
+        # --- log-transformed: log-normal, median = y_f
         lf    <- rjd3toolkit::result(jres, sprintf("l_b(%s)", h))
         sdlog <- jd3_sdlog_from_sd(se, lf)
         dist <- distributional::dist_lognormal(log(mu), sdlog)
+    } else {
+        # additive: normal distribution (mean = median = y_f)
+        dist <- distributional::dist_normal(mu, se)
     }
     idx   <- tsibble::index_var(object$data)
     first <- min(object$data[[idx]])
@@ -206,6 +205,8 @@ backast.mdl_df <- function(object, h, ...) {
     })
     bind_blocks(unlist(blocks, recursive = FALSE))
 }
+#' @keywords internal
+#' @noRd
 bind_blocks <- function(blocks) {
     cols <- names(blocks[[1]])
     out  <- lapply(cols, function(col) {

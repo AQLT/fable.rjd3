@@ -77,7 +77,9 @@
     )
 )
 
-# Run the estimation and return the Java result ---------------------------------
+# Run the estimation and return the Java result
+#' @keywords internal
+#' @noRd
 run_jd3 <- function(engine, y, spec, context = NULL, ...) {
     f    <- pkg_fun(engine$jfun, engine$pkg)
     args <- list(y, spec = spec)
@@ -85,7 +87,9 @@ run_jd3 <- function(engine, y, spec, context = NULL, ...) {
     do.call(f, args)
 }
 
-# Generic training function ------------------------------------------------------
+# Generic training function
+#' @keywords internal
+#' @noRd
 make_jd3_model <- function(
         .data, jres,
         spec, context,
@@ -113,6 +117,8 @@ make_jd3_model <- function(
         class = c(name, extra_class)
     )
 }
+#' @keywords internal
+#' @noRd
 train_jd3 <- function(
         .data, name, spec, context,
         specials,
@@ -141,9 +147,9 @@ train_jd3 <- function(
     )
 }
 
-#' X-13ARIMA-SEATS seasonal adjustment (JDemetra+ v3)
+#' X-13ARIMA seasonal adjustment (JDemetra+ v3)
 #'
-#' Defines an X-13ARIMA-SEATS model to be used inside [fabletools::model()].
+#' Defines an X-13ARIMA model to be used inside [fabletools::model()].
 #' The model is estimated with [rjd3x13::jx13()] and the Java result is kept in
 #' the fitted model, so that all JDemetra+ indicators can be extracted
 #' afterwards (see [jd3_indicator()]).
@@ -199,6 +205,7 @@ train_jd3 <- function(
 #' # Regressor taken from a column of the tsibble
 #' y$shock <- as.numeric(y$index == tsibble::yearmonth("1955 Jan"))
 #' mb <- model(y, x13 = X13(value ~ xreg(shock, regeffect = "Series")))
+#' @importFrom fabletools new_model_class new_model_definition
 #' @export
 X13 <- function(
         formula,
@@ -215,6 +222,8 @@ X13 <- function(
         ref_spec = ref_spec,
         ...)
 }
+#' @keywords internal
+#' @noRd
 train_x13 <- function(
         .data, specials,
         spec = NULL,
@@ -257,8 +266,7 @@ train_x13 <- function(
 #'
 #' # Fit both methods side by side and plot the seasonally adjusted series
 #' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-#' if (requireNamespace("feasts", quietly = TRUE) &&
-#'     requireNamespace("ggtime", quietly = TRUE)) {
+#' if (requireNamespace("ggtime", quietly = TRUE)) {
 #'   ggtime::autoplot(components(mb))
 #' }
 #' @export
@@ -278,6 +286,8 @@ TRAMOSEATS <- function(
         ref_spec = ref_spec,
         ...)
 }
+#' @keywords internal
+#' @noRd
 train_tramoseats <- function(
         .data,
         specials,
@@ -323,8 +333,7 @@ train_tramoseats <- function(
 #'
 #' # Fit both methods side by side and plot the seasonally adjusted series
 #' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-#' if (requireNamespace("feasts", quietly = TRUE) &&
-#'     requireNamespace("ggplot2", quietly = TRUE)) {
+#' if (requireNamespace("ggtime", quietly = TRUE)) {
 #'   ggtime::autoplot(components(mb))
 #' }
 #' @export
@@ -334,7 +343,7 @@ REGARIMA <- function(
         ref_spec = spec,
         ...
 ) {
-    mod <- new_model_class("REGARIMA", train = train_tramoseats,
+    mod <- new_model_class("REGARIMA", train = train_regarima,
                            specials = specials_rjd3)
     new_model_definition(
         mod, {{formula}}, spec = spec,
@@ -342,6 +351,8 @@ REGARIMA <- function(
         ref_spec = ref_spec,
         ...)
 }
+#' @keywords internal
+#' @noRd
 train_regarima <- function(
         .data, specials,
         spec = c("rg4", "rg0", "rg1", "rg2c", "rg3", "rg5c"),
@@ -406,6 +417,8 @@ TRAMO <- function(
         ref_spec = ref_spec,
         ...)
 }
+#' @keywords internal
+#' @noRd
 train_tramo <- function(
         .data, specials,
         spec = c("trfull", "tr0", "tr1", "tr2", "tr3",

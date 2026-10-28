@@ -21,10 +21,14 @@
 # names of the outliers: "YYYY-MM" with the FIRST month of the period, for
 # monthly and quarterly series alike (e.g. "1951-01"; third quarter 1950 is
 # "1950-07"). as.Date() of a yearmonth / yearquarter is the first day of the period.
+#' @keywords internal
+#' @noRd
 jd3_period_label <- function(idx) format(as.Date(idx), "%Y-%m")
 
 # One row per outlier: label, type, date, estimate, std.error, statistic,
 # p.value and `position` (row in the data of the model).
+#' @keywords internal
+#' @noRd
 jd3_outlier_table <- function(object) {
     jres <- get_jres(object)
     nout <- rjd3toolkit::result(jres, "regression.nout")
@@ -98,11 +102,9 @@ jd3_outlier_table <- function(object) {
 #' seasonal outliers (SO). An outlier is dated at one observation, even when
 #' its effect (e.g. a level shift) lasts longer.
 #'
-#' @param object A fitted `jd3_model` (usually a column of a mable passed to
-#'   `outliers()`).
+#' @inheritParams jd3_model_methods_extra
 #' @param type Optional character vector of outlier types to keep, e.g.
 #'   `c("AO", "LS")`. `NULL` (default) keeps all of them.
-#' @param ... Currently unused.
 #'
 #' @return For a `jd3_model`, an integer vector with the row positions of the
 #'   outliers in the data of the model (the contract of
@@ -113,14 +115,14 @@ jd3_outlier_table <- function(object) {
 #'
 #' @seealso [X13()], [TRAMOSEATS()], [jd3_model_methods]
 #'
-#' @examplesIf rjd3jars::check_java_version(silent = TRUE) 
+#' @examplesIf rjd3jars::check_java_version(silent = TRUE)
 #' mb <- model(tsibble::as_tsibble(AirPassengers), x13 = X13(value))
 #'
 #' # Rows of the data that are outliers
-#' fabletools::outliers(mb)
+#' outliers(mb)
 #'
 #' # Additive outliers only
-#' fabletools::outliers(mb, type = "AO")
+#' outliers(mb, type = "AO")
 #' @export
 outliers.jd3_model <- function(object, type = NULL, ...) {
     tab <- jd3_outlier_table(object)

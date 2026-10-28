@@ -6,7 +6,7 @@
 \alias{fable.rjd3-package}
 \title{fable.rjd3: 'fabletools' Interface to JDemetra+ v3 Seasonal Adjustment}
 \description{
-Seasonal adjustment of \code{tsibble} series with X-13ARIMA-SEATS (\code{\link[=X13]{X13()}}) and
+Seasonal adjustment of \code{tsibble} series with X-13ARIMA (\code{\link[=X13]{X13()}}) and
 TRAMO-SEATS (\code{\link[=TRAMOSEATS]{TRAMOSEATS()}}), using the JDemetra+ v3 R packages
 \pkg{rjd3x13} and \pkg{rjd3tramoseats}.
 }

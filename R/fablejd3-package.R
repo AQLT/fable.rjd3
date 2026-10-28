@@ -1,6 +1,6 @@
 #' fable.rjd3: 'fabletools' Interface to JDemetra+ v3 Seasonal Adjustment
 #'
-#' Seasonal adjustment of `tsibble` series with X-13ARIMA-SEATS ([X13()]) and
+#' Seasonal adjustment of `tsibble` series with X-13ARIMA ([X13()]) and
 #' TRAMO-SEATS ([TRAMOSEATS()]), using the JDemetra+ v3 R packages
 #' \pkg{rjd3x13} and \pkg{rjd3tramoseats}.
 #'
@@ -11,7 +11,6 @@
 #' [tidy()][jd3_model_methods] and [report()][jd3_model_methods].
 #'
 #' @keywords internal
-#' @import fabletools
 #' @importFrom generics components tidy glance
 #' @importFrom rlang abort expr sym enexprs as_label
 "_PACKAGE"

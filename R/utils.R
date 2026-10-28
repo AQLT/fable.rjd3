@@ -49,6 +49,18 @@ pkg_fun <- function(name, pkgs) {
 jd3_alive <- function(j) {
   !is.null(j) && !is.null(j$internal) && !rJava::is.jnull(j$internal)
 }
+# Access the Java object (re-estimated on demand if the pointer is dead) ----------
+#' @keywords internal
+#' @noRd
+get_jres <- function(object) {
+    if (!jd3_alive(object$cache$jres)) {
+        object$cache$jres <- run_jd3(
+            object$engine, object$y, object$spec,
+            object$context
+        )
+    }
+    object$cache$jres
+}
 #' @keywords internal
 #' @noRd
 jget_arima_model <- function(jres){

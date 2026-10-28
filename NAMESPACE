@@ -41,6 +41,7 @@ export(jd3_dictionary)
 export(jd3_indicator)
 export(jd3_model)
 export(model)
+export(model_sum)
 export(new_data)
 export(outliers)
 export(refit)
@@ -50,12 +51,15 @@ export(tidy)
 export(tsibble)
 export(yearmonth)
 export(yearquarter)
-import(fabletools)
 importFrom(distributional,hilo)
 importFrom(fabletools,
   accuracy,
   model,
+  model_sum,
+  new_model_class,
+  new_model_definition,
   new_specials,
+  outliers,
   report,
   stream
 )

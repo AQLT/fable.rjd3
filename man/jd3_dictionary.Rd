@@ -16,13 +16,13 @@ jd3_dictionary(object, ...)
 \method{jd3_dictionary}{mdl_df}(object, ...)
 }
 \arguments{
-\item{object}{A fitted mable (\code{mdl_df}), a \code{mdl_ts} or a \code{jd3_model}. For a
-mable, the dictionary of the first model is returned.}
+\item{object}{A fitted mable (\code{mdl_df}), a \code{mdl_ts} or a \code{jd3_model}.}
 
 \item{...}{Currently unused.}
 }
 \value{
 A character vector of indicator ids.
+For a mable, the dictionary of the first model is returned.
 }
 \description{
 Wraps \code{\link[rjd3toolkit:dictionary]{rjd3toolkit::dictionary()}} on the Java result of the model. The

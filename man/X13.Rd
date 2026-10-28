@@ -2,7 +2,7 @@
 % Please edit documentation in R/models.R
 \name{X13}
 \alias{X13}
-\title{X-13ARIMA-SEATS seasonal adjustment (JDemetra+ v3)}
+\title{X-13ARIMA seasonal adjustment (JDemetra+ v3)}
 \usage{
 X13(
   formula,
@@ -34,7 +34,7 @@ fitted, the mable column contains a \code{jd3_model} object. Use
 (columns \code{trend}, \code{seasonal}, \code{irregular} and \code{season_adjust}).
 }
 \description{
-Defines an X-13ARIMA-SEATS model to be used inside \code{\link[fabletools:model]{fabletools::model()}}.
+Defines an X-13ARIMA model to be used inside \code{\link[fabletools:model]{fabletools::model()}}.
 The model is estimated with \code{\link[rjd3x13:jx13]{rjd3x13::jx13()}} and the Java result is kept in
 the fitted model, so that all JDemetra+ indicators can be extracted
 afterwards (see \code{\link[=jd3_indicator]{jd3_indicator()}}).

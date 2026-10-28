@@ -1,6 +1,6 @@
 Package: fable.rjd3
 Type: Package
-Title: 'JDemetra+' v3 Seasonal Adjustment Models for 'fable'
+Title: 'JDemetra+' Seasonal Adjustment Models for 'fable'
 Version: 0.1.0
 Description: Provides an interface to JDemetra+ v3 seasonal adjustment algorithms 
     (X-13ARIMA-SEATS and TRAMO-SEATS) for use with the 'fable' forecasting and 

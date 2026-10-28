@@ -1,4 +1,6 @@
 # Fits one SA-item and returns a one-row mable (NULL if unsupported)
+#' @keywords internal
+#' @noRd
 jd3_fit_item <- function(jsai, sap, name, ctx) {
     est <- rjd3workspace::get_estimation_specification(jsai)
     ref <- rjd3workspace::get_reference_specification(jsai)
@@ -95,12 +97,15 @@ import_jws <- function(file, compute = TRUE) {
 # that import -> export keeps the names of the workspace.
 # Calendars cannot be renamed this way: a name used for two different calendars
 # is an error.
-
+#' @keywords internal
+#' @noRd
 jd3_slug <- function(x) gsub("[^A-Za-z0-9]+", "_", x)
 
 # Replace exact matches of variable ids (old = new, named character vector) in
 # any character vector of a spec, whatever its position. CHECK on a real spec
 # that the ids are stored as "<group>.<name>" (see the verification below).
+#' @keywords internal
+#' @noRd
 jd3_replace_ids <- function(x, map) {
     if (is.list(x)) {
         x[] <- lapply(x, jd3_replace_ids, map = map)   # keeps names and attributes
@@ -114,6 +119,8 @@ jd3_replace_ids <- function(x, map) {
 }
 
 # Variables of a context as a data frame: group, name, id
+#' @keywords internal
+#' @noRd
 jd3_context_vars <- function(ctx) {
     rows <- lapply(names(ctx$variables), function(g) {
         v <- names(ctx$variables[[g]])
@@ -127,6 +134,8 @@ jd3_context_vars <- function(ctx) {
 # `context` (renamed if needed) and `renamed` (logical); `context` is the single
 # context of the workspace. If `check`, every renamed model is re-estimated and
 # its seasonally adjusted series compared with the original one.
+#' @keywords internal
+#' @noRd
 jd3_unify_contexts <- function(items) {
     ctxs <- lapply(items, function(it) it$model$context)
 
@@ -209,6 +218,8 @@ jd3_unify_contexts <- function(items) {
 }
 
 # Models of a mable with their SA-processing and SA-item names
+#' @keywords internal
+#' @noRd
 jd3_collect_models <- function(mb, sap, series) {
     mv   <- fabletools::mable_vars(mb)
     keys <- tibble::as_tibble(mb)[setdiff(names(mb), mv)]
@@ -278,7 +289,7 @@ export_jws <- function(
             rjd3workspace::set_reference_specification(sp, idx, it$ref_spec)
         }
     }
-    ok <- rjd3workspace::save_workspace(jws, file, replace = TRUE, verbose = FALSE)
+    rjd3workspace::save_workspace(jws, file, replace = TRUE, verbose = FALSE)
     invisible(file)
 }
 

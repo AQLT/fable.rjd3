@@ -1,6 +1,7 @@
 # A "step" is a call to a `set_*()` / `add_*()` function of rjd3toolkit
 # (spec -> spec), recorded by a special and applied later in `build_spec()`.
-
+#' @keywords internal
+#' @noRd
 rjd3_spec_fun <- function(fn, ...) {
     structure(list(fn = fn, args = list(...)), class = "rjd3_spec_fun")
 }
@@ -89,6 +90,8 @@ specials_rjd3 <- fabletools::new_specials(
 # Build the final specification and modelling context.
 # Precedence: base spec < formula specials < xreg.
 #' @importFrom stats setNames
+#' @keywords internal
+#' @noRd
 build_jd3_spec <- function(spec, context, specials, y, engine, ref_spec = spec) {
     bad <- intersect(engine$unsupported, names(specials))
     bad <- bad[lengths(specials[bad]) > 0]
@@ -140,7 +143,8 @@ build_jd3_spec <- function(spec, context, specials, y, engine, ref_spec = spec) 
     }
     list(spec = spec, context = context, ref_spec = base)
 }
-
+#' @keywords internal
+#' @noRd
 remove_usrdefvar <- function(spec, name = NULL) {
     if (is.null(name)){
         return (spec)

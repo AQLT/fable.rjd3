@@ -8,6 +8,7 @@
 \alias{accuracy}
 \alias{stream}
 \alias{outliers}
+\alias{model_sum}
 \alias{forecast}
 \alias{components}
 \alias{glance}
@@ -31,7 +32,7 @@ below to see their documentation.
 \describe{
   \item{distributional}{\code{\link[distributional:hilo]{hilo()}}}
 
-  \item{fabletools}{\code{\link[fabletools:accuracy]{accuracy}}, \code{\link[fabletools:model]{model()}}, \code{\link[fabletools:outliers]{outliers()}}, \code{\link[fabletools:report]{report()}}, \code{\link[fabletools:stream]{stream()}}}
+  \item{fabletools}{\code{\link[fabletools:accuracy]{accuracy}}, \code{\link[fabletools:model]{model()}}, \code{\link[fabletools:model_sum]{model_sum()}}, \code{\link[fabletools:outliers]{outliers()}}, \code{\link[fabletools:report]{report()}}, \code{\link[fabletools:stream]{stream()}}}
 
   \item{generics}{\code{\link[generics:augment]{augment()}}, \code{\link[generics:components]{components()}}, \code{\link[generics:forecast]{forecast()}}, \code{\link[generics:glance]{glance()}}, \code{\link[generics:interpolate]{interpolate()}}, \code{\link[generics:refit]{refit()}}, \code{\link[generics:tidy]{tidy()}}}
 

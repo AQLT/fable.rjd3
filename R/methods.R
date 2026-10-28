@@ -1,14 +1,3 @@
-# Access the Java object (re-estimated on demand if the pointer is dead) ----------
-get_jres <- function(object) {
-    if (!jd3_alive(object$cache$jres)) {
-        object$cache$jres <- run_jd3(
-            object$engine, object$y, object$spec,
-            object$context
-        )
-    }
-    object$cache$jres
-}
-
 #' Extract the model object from a fitted mable cell
 #'
 #' Returns the `jd3_model` object stored in a fitted model. It is mostly useful
@@ -45,7 +34,7 @@ jd3_model <- function(x) {
 #' @inheritParams stats::printCoefmat
 #' @param thresholds_pval Threshold used to interpret p-values statistic test.
 #' By default `c(Severe = 0.001, Bad = 0.01, Uncertain = 0.05, Good = Inf)`.
-#' @param ... Currently unused.
+#' @inheritParams X13
 #'
 #' @return
 #' * `components()`: a `dable` with the response and the columns `trend`,
@@ -105,7 +94,7 @@ components.jd3_sa_model <- function(object, ...){
         season_adjust = sa_expr
     )
 
-    dcmp <- as_dable(
+    dcmp <- fabletools::as_dable(
         out, method = object$engine$method,
         resp = !!sym(object$resp),
         seasons = list(seasonal = "year"),
@@ -467,10 +456,9 @@ report.jd3_model <- function(
 #' @param type Residual type: `"innovation"` (default) or `"regression"`.
 #' @param policy Refresh policy, a character string (see the functions above for
 #'   the available policies; default `"Fixed"`: the estimated parameters are
-#'   kept). `NULL` (`refit()` only) re-estimates the original specification on
-#'   the new data.
+#'   kept).
 #' @inheritParams rjd3x13::refresh
-#' @param ... Currently unused.
+#' @inheritParams jd3_model_methods
 #'
 #' @return
 #' * `fitted()`, `residuals()`: a numeric vector with one value per observation
@@ -510,9 +498,7 @@ report.jd3_model <- function(
 #' components(mb_ext)
 #'
 #' # refit(): apply the model to the full data
-#' refit(mb_old, y)                      # refresh policy "FreeParameters" (default)
-#' refit(mb_old, y, policy = NULL)       # specification re-estimated
-#' # other refresh policies: see ?rjd3x13::x13_refresh
+#' refit(mb_old, y)                      # refresh policy "Fixed" (default)
 #' @name jd3_model_methods_extra
 NULL
 
@@ -568,7 +554,7 @@ interpolate.jd3_model <- function(object, new_data = NULL, specials = NULL, ...)
         jres <- get_jres(object)
         interpolate_d <- rjd3toolkit::result(
             jres,
-            c("yc")
+            "yc"
         )
         out[[resp]] <- as.numeric(interpolate_d)
     }
@@ -651,6 +637,16 @@ jd3_refresh_spec <- function(
         start = NULL,
         end = NULL
 ) {
+    choices <- c("FreeParameters", "Complete", "Outliers_StochasticComponent",
+                 "Outliers", "FixedParameters", "FixedAutoRegressiveParameters",
+                 "Fixed", "Current")
+    matched_idx <- which(tolower(policy)[1] == tolower(choices))
+
+    if (length(matched_idx) == 0) {
+        stop(sprintf("Argument 'policy' invalid. Accepted values: %s",
+                     paste(choices, collapse = ", ")))
+    }
+    policy <- choices[matched_idx]
     refresh_fun <- pkg_fun(object$engine$refresh_fun, object$engine$pkg)
     refresh_fun(
         jd3_result_spec(object),

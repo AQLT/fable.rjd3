@@ -7,8 +7,7 @@
 \method{outliers}{jd3_model}(object, type = NULL, ...)
 }
 \arguments{
-\item{object}{A fitted \code{jd3_model} (usually a column of a mable passed to
-\code{outliers()}).}
+\item{object}{A fitted \code{jd3_model} (usually a column of a mable).}
 
 \item{type}{Optional character vector of outlier types to keep, e.g.
 \code{c("AO", "LS")}. \code{NULL} (default) keeps all of them.}
@@ -31,14 +30,14 @@ seasonal outliers (SO). An outlier is dated at one observation, even when
 its effect (e.g. a level shift) lasts longer.
 }
 \examples{
-\dontshow{if (rjd3jars::check_java_version(silent = TRUE) ) withAutoprint(\{ # examplesIf}
+\dontshow{if (rjd3jars::check_java_version(silent = TRUE)) withAutoprint(\{ # examplesIf}
 mb <- model(tsibble::as_tsibble(AirPassengers), x13 = X13(value))
 
 # Rows of the data that are outliers
-fabletools::outliers(mb)
+outliers(mb)
 
 # Additive outliers only
-fabletools::outliers(mb, type = "AO")
+outliers(mb, type = "AO")
 \dontshow{\}) # examplesIf}
 }
 \seealso{
