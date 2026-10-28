@@ -45,10 +45,10 @@ y  <- tsibble::as_tsibble(AirPassengers)
 mb <- model(y, x13 = X13(value))
 
 # The mean is the bias-corrected forecast
-fabletools::forecast(mb, h = 12)
+forecast(mb, h = 12)
 
 # JDemetra+'s own forecast (median of the distribution)
-fabletools::forecast(mb, h = 12, point_forecast = list(.median = median))
+forecast(mb, h = 12, point_forecast = list(.median = median))
 \dontshow{\}) # examplesIf}
 }
 \seealso{

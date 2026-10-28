@@ -16,8 +16,6 @@
 \alias{augment}
 \alias{interpolate}
 \alias{refit}
-\alias{autoplot}
-\alias{hilo}
 \alias{as_tsibble}
 \alias{tsibble}
 \alias{yearmonth}
@@ -30,13 +28,9 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{distributional}{\code{\link[distributional:hilo]{hilo()}}}
-
   \item{fabletools}{\code{\link[fabletools:accuracy]{accuracy}}, \code{\link[fabletools:model]{model()}}, \code{\link[fabletools:model_sum]{model_sum()}}, \code{\link[fabletools:outliers]{outliers()}}, \code{\link[fabletools:report]{report()}}, \code{\link[fabletools:stream]{stream()}}}
 
   \item{generics}{\code{\link[generics:augment]{augment()}}, \code{\link[generics:components]{components()}}, \code{\link[generics:forecast]{forecast()}}, \code{\link[generics:glance]{glance()}}, \code{\link[generics:interpolate]{interpolate()}}, \code{\link[generics:refit]{refit()}}, \code{\link[generics:tidy]{tidy()}}}
-
-  \item{ggplot2}{\code{\link[ggplot2:autoplot]{autoplot()}}}
 
   \item{tsibble}{\code{\link[tsibble:as_tsibble]{as_tsibble()}}, \code{\link[tsibble:new_data]{new_data()}}, \code{\link[tsibble:tsibble]{tsibble()}}, \code{\link[tsibble:yearmonth]{yearmonth()}}, \code{\link[tsibble:yearquarter]{yearquarter()}}}
 }}

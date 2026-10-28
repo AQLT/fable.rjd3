@@ -49,9 +49,8 @@ components(mb)
 
 # Fit both methods side by side and plot the seasonally adjusted series
 mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-if (requireNamespace("feasts", quietly = TRUE) &&
-    requireNamespace("ggplot2", quietly = TRUE)) {
-  ggplot2::autoplot(components(mb))
+if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
+  autoplot(components(mb))
 }
 \dontshow{\}) # examplesIf}
 }

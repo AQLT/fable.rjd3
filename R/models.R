@@ -266,8 +266,8 @@ train_x13 <- function(
 #'
 #' # Fit both methods side by side and plot the seasonally adjusted series
 #' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-#' if (requireNamespace("ggtime", quietly = TRUE)) {
-#'   ggtime::autoplot(components(mb))
+#' if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
+#'   autoplot(components(mb))
 #' }
 #' @export
 TRAMOSEATS <- function(
@@ -333,8 +333,8 @@ train_tramoseats <- function(
 #'
 #' # Fit both methods side by side and plot the seasonally adjusted series
 #' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-#' if (requireNamespace("ggtime", quietly = TRUE)) {
-#'   ggtime::autoplot(components(mb))
+#' if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
+#'   autoplot(components(mb))
 #' }
 #' @export
 REGARIMA <- function(
@@ -396,9 +396,8 @@ train_regarima <- function(
 #'
 #' # Fit both methods side by side and plot the seasonally adjusted series
 #' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-#' if (requireNamespace("feasts", quietly = TRUE) &&
-#'     requireNamespace("ggplot2", quietly = TRUE)) {
-#'   ggplot2::autoplot(components(mb))
+#' if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
+#'   autoplot(components(mb))
 #' }
 #' @export
 TRAMO <- function(

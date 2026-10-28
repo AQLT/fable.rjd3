@@ -91,10 +91,10 @@ jd3_sdlog_from_sd <- function(sd, m) {
 #' mb <- model(y, x13 = X13(value))
 #'
 #' # The mean is the bias-corrected forecast
-#' fabletools::forecast(mb, h = 12)
+#' forecast(mb, h = 12)
 #'
 #' # JDemetra+'s own forecast (median of the distribution)
-#' fabletools::forecast(mb, h = 12, point_forecast = list(.median = median))
+#' forecast(mb, h = 12, point_forecast = list(.median = median))
 #' @export
 forecast.jd3_model <- function(object, new_data = NULL, ...) {
     h    <- nrow(new_data)

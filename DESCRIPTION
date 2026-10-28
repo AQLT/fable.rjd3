@@ -21,7 +21,6 @@ Imports:
     fabletools (>= 0.3.0),
     tsibble (>= 1.1.0),
     generics,
-    ggplot2,
     distributional,
     rlang,
     stats,
@@ -32,7 +31,8 @@ Suggests:
     feasts,
     knitr,
     rmarkdown,
-    ggtime
+    ggtime,
+    ggplot2
 SystemRequirements: Java (>= 17)
 License: EUPL
 URL: https://aqlt.github.io/fable.rjd3/, https://github.com/AQLT/fable.rjd3

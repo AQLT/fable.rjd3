@@ -66,16 +66,6 @@ generics::interpolate
 #' @export
 generics::refit
 
-# --- plotting and distributions ---------------------------------------------------
-
-#' @importFrom ggplot2 autoplot
-#' @export
-ggplot2::autoplot
-
-#' @importFrom distributional hilo
-#' @export
-distributional::hilo
-
 # --- tsibble: needed to build the input data (optional, remove if unwanted) ------
 
 #' @importFrom tsibble as_tsibble

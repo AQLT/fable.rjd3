@@ -13,8 +13,8 @@ can_run <- requireNamespace("rjd3x13", quietly = TRUE) &&
 requireNamespace("rjd3tramoseats", quietly = TRUE) &&
 requireNamespace("rjd3toolkit", quietly = TRUE)
 has_plot <- can_run &&
-requireNamespace("feasts", quietly = TRUE) &&
-requireNamespace("ggplot2", quietly = TRUE)
+requireNamespace("ggplot2", quietly = TRUE) &&
+requireNamespace("ggtime", quietly = TRUE)
 
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = can_run)
 ```
@@ -71,12 +71,12 @@ mb
 components(mb)
 ```
 
-With the `feasts` package loaded, the decomposition can be plotted with
+With the `ggtime` package loaded, the decomposition can be plotted with
 `autoplot()`.
 
 ```{r autoplot, eval = has_plot, fig.width = 7, fig.height = 6}
-library(feasts)
-ggtime::autoplot(components(mb))
+library(ggtime)
+autoplot(components(mb))
 ```
 
 ## Setting the specification

@@ -28,13 +28,11 @@ export(X13)
 export(accuracy)
 export(as_tsibble)
 export(augment)
-export(autoplot)
 export(backast)
 export(components)
 export(export_jws)
 export(forecast)
 export(glance)
-export(hilo)
 export(import_jws)
 export(interpolate)
 export(jd3_dictionary)
@@ -51,7 +49,6 @@ export(tidy)
 export(tsibble)
 export(yearmonth)
 export(yearquarter)
-importFrom(distributional,hilo)
 importFrom(fabletools,
   accuracy,
   model,
@@ -72,7 +69,6 @@ importFrom(generics,
   refit,
   tidy
 )
-importFrom(ggplot2,autoplot)
 importFrom(rJava,
   .jaddClassPath,
   .jpackage
