@@ -1,0 +1,50 @@
+Package: fable.rjd3
+Type: Package
+Title: 'JDemetra+' v3 Seasonal Adjustment Models for 'fable'
+Version: 0.1.0
+Description: Provides an interface to JDemetra+ v3 seasonal adjustment algorithms 
+    (X-13ARIMA-SEATS and TRAMO-SEATS) for use with the 'fable' forecasting and 
+    decomposition framework. It enables seasonal adjustment on 'tsibble' objects 
+    using the standard 'model()' and 'components()' workflow.
+Authors@R: c(person("Alain", "Quartier-la-Tente", role = c("aut", "cre", "cph"),
+                 email = "alain.quartier@yahoo.fr",
+                 comment = c(ORCID = "0000-0001-7890-3857")))
+Depends:
+    R (>= 4.1.0)
+Imports:
+    rjd3jars(>= 0.0.6),
+    rjd3toolkit (>= 3.0.0),
+    rjd3x13 (>= 3.9.0.9000),
+    rjd3tramoseats (>= 3.9.0.9000),
+    rjd3workspace (>= 3.9.0),
+    rJava,
+    fabletools (>= 0.3.0),
+    tsibble (>= 1.1.0),
+    generics,
+    ggplot2,
+    distributional,
+    rlang,
+    stats,
+    tibble,
+    dplyr
+VignetteBuilder: knitr
+Suggests:
+    feasts,
+    knitr,
+    rmarkdown,
+    ggtime
+SystemRequirements: Java (>= 17)
+License: EUPL
+URL: https://aqlt.github.io/fable.rjd3/, https://github.com/AQLT/fable.rjd3
+BugReports: https://github.com/AQLT/fable.rjd3/issues
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.1
+Remotes:  
+    github::rjdverse/rjd3jars,
+    github::rjdverse/rjd3providers,
+    github::rjdverse/rjd3toolkit,
+    github::rjdverse/rjd3tramoseats,
+    github::rjdverse/rjd3x13,
+    github::rjdverse/rjd3workspace

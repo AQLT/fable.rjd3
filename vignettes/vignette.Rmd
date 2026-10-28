@@ -1,0 +1,227 @@
+---
+title: "Seasonal adjustment of tsibbles with fable.rjd3"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Seasonal adjustment of tsibbles with fable.rjd3}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r setup, include = FALSE}
+# The examples need Java and the JDemetra+ v3 packages
+can_run <- requireNamespace("rjd3x13", quietly = TRUE) &&
+requireNamespace("rjd3tramoseats", quietly = TRUE) &&
+requireNamespace("rjd3toolkit", quietly = TRUE)
+has_plot <- can_run &&
+requireNamespace("feasts", quietly = TRUE) &&
+requireNamespace("ggplot2", quietly = TRUE)
+
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = can_run)
+```
+
+## Introduction
+
+`fable.rjd3` lets you seasonally adjust `tsibble` series with the JDemetra+ v3
+algorithms, using the [`fabletools`](https://fabletools.tidyverts.org/)
+modelling framework:
+
+* `X13()` calls `rjd3x13::jx13()` (X-13ARIMA-SEATS);
+* `TRAMOSEATS()` calls `rjd3tramoseats::.jtramoseats()` (TRAMO-SEATS).
+
+The fitted models keep the underlying **Java object**. The usual decomposition
+is available through `components()`, and *any* other JDemetra+ indicator
+(outliers, regression coefficients, diagnostics...) can be extracted with
+`jd3_indicator()`.
+
+```{r load}
+library(fable.rjd3)
+library(fabletools)
+```
+
+## Quick start
+
+The series must be a univariate `tsibble` with a `yearmonth` or `yearquarter`
+index and no gaps. Here we use the classic `AirPassengers` data.
+
+```{r data}
+air <- tsibble::as_tsibble(AirPassengers)
+air
+```
+
+Models are fitted with `model()`, exactly as with other `fable` models. Several
+models can be fitted at once, which makes it easy to compare the two methods.
+
+```{r fit}
+mb <- model(
+    air,
+    x13 = X13(value),
+    ts  = TRAMOSEATS(value)
+)
+mb
+```
+
+## Decomposition
+
+`components()` returns a `dable` with the original series and the columns
+`trend`, `seasonal`, `irregular` and `season_adjust`. The adjustment mode
+(additive or multiplicative) is detected automatically and stored in the
+`season_adjust` alias.
+
+```{r components}
+components(mb)
+```
+
+With the `feasts` package loaded, the decomposition can be plotted with
+`autoplot()`.
+
+```{r autoplot, eval = has_plot, fig.width = 7, fig.height = 6}
+library(feasts)
+ggtime::autoplot(components(mb))
+```
+
+## Setting the specification
+
+The specification can be defined in two ways, which can be combined.
+
+### Ex ante, with the `spec` argument
+
+`spec` accepts a name (such as `"rsa3"` for `X13()` or `"rsafull"` for
+`TRAMOSEATS()`), or a specification object created with `rjd3x13::x13_spec()` /
+`rjd3tramoseats::tramoseats_spec()` and modified with the `set_*()` functions
+of `rjd3toolkit`. This gives access to everything JDemetra+ offers.
+
+```{r spec-exante}
+my_spec <- rjd3x13::x13_spec("rsa3")
+my_spec <- rjd3toolkit::set_transform(my_spec, fun = "Log")
+my_spec <- rjd3toolkit::add_outlier(my_spec, type = "AO", date = "1955-01-01")
+
+mb_spec <- model(air, x13 = X13(value, spec = my_spec))
+glance(mb_spec)
+```
+
+### In the formula, with specials
+
+Specials are used on the right-hand side of the formula. Each one records a call
+to a function of `rjd3toolkit` that is applied to the base specification:
+
+| Special | Calls |
+|:--------|:------|
+| `transform(...)` | `rjd3toolkit::set_transform()` |
+| `estimate(...)` | `rjd3toolkit::set_estimate()` |
+| `outlier(...)` | `rjd3toolkit::set_outlier()` |
+| `add_outlier(...)` | `rjd3toolkit::add_outlier()` |
+| `easter(...)` | `rjd3toolkit::set_easter()` |
+| `tradingdays(...)` | `rjd3toolkit::set_tradingdays()` |
+| `arima(...)` | `rjd3toolkit::set_arima()` |
+| `jd3(fn, ...)` | any `spec -> spec` function, by name |
+| `xreg(...)` | user regressors taken from tsibble columns |
+
+```{r specials}
+mb_sp <- model(
+    air,
+    x13 = X13(
+        value ~ transform(fun = "Log") +
+            outlier(outliers.type = c("AO", "LS")) +
+            x11(seasonal.filter	 = "S3X5")
+    )
+)
+glance(mb_sp)
+```
+
+The base `spec` is applied first, then the specials, then `xreg()`: later
+settings override earlier ones. The same specials work for `TRAMOSEATS()`.
+
+### Regressors from the tsibble
+
+Since a specification created ex ante cannot refer to columns of your data,
+regressors are declared with the `xreg()` special. The `regeffect` argument
+tells JDemetra+ which component the regressor belongs to.
+
+```{r xreg}
+air$shock <- as.numeric(air$index == tsibble::yearmonth("1955 Jan"))
+
+mb_xreg <- model(air, x13 = X13(value ~ xreg(shock, regeffect = "Series")))
+tidy(mb_xreg)
+```
+
+For custom calendars, build a context with `rjd3toolkit::modelling_context()`
+and pass it through the `context` argument.
+
+## Extracting results
+
+### Diagnostics and regression terms
+
+`glance()` returns a one-row summary per model, `tidy()` returns the scalar
+regression indicators (regressors and outliers by default), and `report()`
+prints the specification and the diagnostics.
+
+```{r glance}
+glance(mb)
+tidy(mb_sp)
+report(mb["x13"])
+```
+
+Both accept arguments to select other indicators: `glance(x, ids = )` takes a
+vector of indicator ids, and `tidy(x, pattern = )` a regular expression.
+
+### Any JDemetra+ indicator
+
+`jd3_dictionary()` lists the ids of all available indicators, and
+`jd3_indicator()` extracts one of them via `rjd3toolkit::result()`.
+
+```{r indicators}
+head(jd3_dictionary(mb), 15)
+
+# one indicator for a single model
+jd3_indicator(mb$x13[[1]], "sa")
+
+# the same indicator for all models of the mable
+jd3_indicator(mb, "sa")
+```
+
+## Several series
+
+Because models are defined through `fabletools`, keyed tsibbles work as usual:
+one model is fitted per series.
+
+```{r keys}
+a <- as.data.frame(air[c("index", "value")]); a$series <- "A"
+b <- a; b$value <- sqrt(b$value) * 10; b$series <- "B"
+two <- tsibble::as_tsibble(rbind(a, b), index = index, key = series)
+
+mb2 <- model(two, x13 = X13(value))
+mb2
+glance(mb2)
+```
+
+## Saving and reloading models
+
+The Java object cannot be serialized: after `saveRDS()` / `readRDS()` (or when a
+model is created on a `future` worker) the Java pointer is no longer valid.
+`fable.rjd3` handles this transparently:
+
+* the decomposition returned by `components()` is computed at fitting time and
+is always available;
+* the specification, series and context are stored as regular R objects, so
+`jd3_indicator()`, `glance()` and `tidy()` simply re-estimate the model the
+first time they are called on a reloaded object.
+
+```{r saving}
+f <- tempfile(fileext = ".rds")
+saveRDS(mb, f)
+mb_reloaded <- readRDS(f)
+
+components(mb_reloaded)                 # no re-estimation needed
+jd3_indicator(mb_reloaded, "sa")        # model is re-estimated on demand
+```
+
+## Limitations
+
+* Only `yearmonth` and `yearquarter` indices are supported, and the series
+must be univariate and regular.
+
+* Models define a decomposition, not a forecasting model: `forecast()` is not
+implemented.
+
+* The available indicator ids depend on the installed version of the
+`rjd3*` packages; use `jd3_dictionary()` to list them.
