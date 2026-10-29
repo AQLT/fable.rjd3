@@ -257,10 +257,10 @@ forecast(mb_pre, h = 12)
 forecast(mb_pre, h = 12, point_forecast = list(.median = median))
 ```
 
-`backast()` does the same for the periods preceding the series.
+`backcast()` does the same for the periods preceding the series.
 
-```{r backast}
-backast(mb, h = 12)
+```{r backcast}
+backcast(mb, h = 12)
 ```
 
 ### Fitted values, residuals and missing values

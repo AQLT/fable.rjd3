@@ -11,7 +11,7 @@
 #' [jd3_dictionary()]. The usual `fabletools` verbs work on the fitted
 #' mable: [components()][jd3_model_methods], [glance()][jd3_model_methods],
 #' [tidy()][jd3_model_methods] and [report()][jd3_model_methods], as well as
-#' [forecast()][forecast.jd3_model], [backast()] and [outliers()][outliers.jd3_model].
+#' [forecast()][forecast.jd3_model], [backcast()] and [outliers()][outliers.jd3_model].
 #'
 #' @keywords internal
 #' @importFrom generics components tidy glance

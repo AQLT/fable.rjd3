@@ -18,7 +18,7 @@ JDemetra+ can be extracted with \code{\link[=jd3_indicator]{jd3_indicator()}} an
 \code{\link[=jd3_dictionary]{jd3_dictionary()}}. The usual \code{fabletools} verbs work on the fitted
 mable: \link[=jd3_model_methods]{components()}, \link[=jd3_model_methods]{glance()},
 \link[=jd3_model_methods]{tidy()} and \link[=jd3_model_methods]{report()}, as well as
-\link[=forecast.jd3_model]{forecast()}, \code{\link[=backast]{backast()}} and \link[=outliers.jd3_model]{outliers()}.
+\link[=forecast.jd3_model]{forecast()}, \code{\link[=backcast]{backcast()}} and \link[=outliers.jd3_model]{outliers()}.
 }
 \seealso{
 Useful links:

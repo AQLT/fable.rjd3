@@ -60,7 +60,7 @@ jd3_sdlog_from_sd <- function(sd, m) {
 #' Forecasts the raw series from the pre-adjustment model (RegARIMA / TRAMO)
 #' of a model fitted with [X13()], [TRAMOSEATS()], [REGARIMA()] or [TRAMO()]. The values are read from
 #' the stored JDemetra+ result, so the seasonal adjustment itself is not
-#' affected. For the past, see [backast()].
+#' affected. For the past, see [backcast()].
 #'
 #' @section Distribution:
 #' For log-transformed series, the forecast distribution is log-normal, with a
@@ -83,7 +83,7 @@ jd3_sdlog_from_sd <- function(sd, m) {
 #'   row of `new_data`: log-normal if the series is log-transformed, normal
 #'   otherwise. Called through `forecast()` on a mable, the result is a fable.
 #'
-#' @seealso [backast()], [X13()], [TRAMOSEATS()], [jd3_indicator()] to
+#' @seealso [backcast()], [X13()], [TRAMOSEATS()], [jd3_indicator()] to
 #'   extract the raw indicators (`y_f`, `y_ef`...).
 #'
 #' @examplesIf rjd3jars::check_java_version(silent = TRUE)
@@ -148,18 +148,18 @@ forecast.jd3_model <- function(object, new_data = NULL, ...) {
 #' y  <- tsibble::as_tsibble(AirPassengers)
 #' mb <- model(y, x13 = X13(value))
 #'
-#' bc <- backast(mb, h = 12)
+#' bc <- backcast(mb, h = 12)
 #' bc
 #'
 #' # A single model
-#' bc1 <- backast(mb$x13[[1]], h = 12)
+#' bc1 <- backcast(mb$x13[[1]], h = 12)
 #' median(bc1$dist)
 #' @export
-backast <- function(object, h, ...) UseMethod("backast")
+backcast <- function(object, h, ...) UseMethod("backcast")
 
-#' @rdname backast
+#' @rdname backcast
 #' @export
-backast.jd3_model <- function(object, h, ...) {
+backcast.jd3_model <- function(object, h, ...) {
     jres <- get_jres(object)
     res_rjd <- rjd3toolkit::user_defined(
         jres,
@@ -190,18 +190,18 @@ backast.jd3_model <- function(object, h, ...) {
     tsibble::as_tsibble(out, index = !!rlang::sym(idx))
 }
 
-#' @rdname backast
+#' @rdname backcast
 #' @export
-backast.mdl_ts <- function(object, h, ...) backast(jd3_model(object), h)
+backcast.mdl_ts <- function(object, h, ...) backcast(jd3_model(object), h)
 
-#' @rdname backast
+#' @rdname backcast
 #' @export
-backast.mdl_df <- function(object, h, ...) {
+backcast.mdl_df <- function(object, h, ...) {
     mv   <- fabletools::mable_vars(object)
     keys <- tibble::as_tibble(object)[setdiff(names(object), mv)]
     blocks <- lapply(mv, function(m) {
         lapply(seq_along(object[[m]]), function(i) {
-            bc <- tibble::as_tibble(backast(jd3_model(object[[m]][[i]]), h))
+            bc <- tibble::as_tibble(backcast(jd3_model(object[[m]][[i]]), h))
             tibble::tibble(keys[i, , drop = FALSE], .model = m, bc)
         })
     })

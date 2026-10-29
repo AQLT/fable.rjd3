@@ -33,8 +33,15 @@ parameters; use with \code{\link[=X13]{X13()}} only).
 decomposition parameters; use with \code{\link[=TRAMOSEATS]{TRAMOSEATS()}} only).
 \item \code{benchmarking(...)}: arguments passed to \code{\link[rjd3toolkit:set_benchmarking]{rjd3toolkit::set_benchmarking()}}
 (use with \code{\link[=X13]{X13()}} or \code{\link[=TRAMOSEATS]{TRAMOSEATS()}} only).
-\item \code{xreg(...)}: user-defined regressors taken from
+\item \code{xreg(..., regeffect = NULL, group = "r", lag = 0, coef = NULL)}: user-defined regressors taken from
 columns of the tsibble and added to the context.
+By default (\code{regeffect = NULL}), the regressors are only added to the
+context (with the \code{group="r"}).
+If \code{regeffect} is equals to \code{"Undefined"}, \code{"Trend"}, \code{"Seasonal"}, \code{"Irregular"},
+\code{"Series"} or \code{"SeasonallyAdjusted"} then variable is also added to the specification
+using the \code{\link[rjd3toolkit:add_usrdefvar]{rjd3toolkit::add_usrdefvar()}} function with the parameters \code{lag} and \code{coeff}.
+If \code{regeffect = "Calendar"}, then the variable is added to the specification using the
+\code{\link[rjd3toolkit:set_tradingdays]{rjd3toolkit::set_tradingdays()}} function.
 }
 }
 

@@ -319,7 +319,7 @@ report.jd3_model <- function(
     # a data frame, not a tibble: the terms are used as row names below, and
     # tibbles do not support row names
     reg_coef <- as.data.frame(tidy(object))
-    colnames(reg_coef)[-1] <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
+    colnames(reg_coef)[-1] <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
     rownames(reg_coef) <- make.unique(reg_coef$term)
     reg_coef$term <- NULL
 

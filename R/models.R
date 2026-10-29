@@ -320,7 +320,7 @@ train_tramoseats <- function(
 #' with a warning.
 #'
 #' There is no decomposition, so `components()` is not available. The other
-#' methods are: `fitted()`, `residuals()`, `forecast()`, `backast()`,
+#' methods are: `fitted()`, `residuals()`, `forecast()`, `backcast()`,
 #' `outliers()`, `tidy()`, `glance()` and `report()`.
 #'
 #' @inheritParams X13
@@ -384,7 +384,7 @@ train_regarima <- function(
 #' ignored with a warning.
 #'
 #' There is no decomposition, so `components()` is not available. The other
-#' methods are: `fitted()`, `residuals()`, `forecast()`, `backast()`,
+#' methods are: `fitted()`, `residuals()`, `forecast()`, `backcast()`,
 #' `outliers()`, `tidy()`, `glance()` and `report()`.
 #'
 #' @inheritParams X13

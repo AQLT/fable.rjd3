@@ -23,7 +23,7 @@ otherwise. Called through \code{forecast()} on a mable, the result is a fable.
 Forecasts the raw series from the pre-adjustment model (RegARIMA / TRAMO)
 of a model fitted with \code{\link[=X13]{X13()}}, \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}, \code{\link[=REGARIMA]{REGARIMA()}} or \code{\link[=TRAMO]{TRAMO()}}. The values are read from
 the stored JDemetra+ result, so the seasonal adjustment itself is not
-affected. For the past, see \code{\link[=backast]{backast()}}.
+affected. For the past, see \code{\link[=backcast]{backcast()}}.
 }
 \section{Distribution}{
 
@@ -52,6 +52,6 @@ forecast(mb, h = 12, point_forecast = list(.median = median))
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=backast]{backast()}}, \code{\link[=X13]{X13()}}, \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}, \code{\link[=jd3_indicator]{jd3_indicator()}} to
+\code{\link[=backcast]{backcast()}}, \code{\link[=X13]{X13()}}, \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}, \code{\link[=jd3_indicator]{jd3_indicator()}} to
 extract the raw indicators (\code{y_f}, \code{y_ef}...).
 }

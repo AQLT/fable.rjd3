@@ -44,7 +44,7 @@ with a warning.
 }
 \details{
 There is no decomposition, so \code{components()} is not available. The other
-methods are: \code{fitted()}, \code{residuals()}, \code{forecast()}, \code{backast()},
+methods are: \code{fitted()}, \code{residuals()}, \code{forecast()}, \code{backcast()},
 \code{outliers()}, \code{tidy()}, \code{glance()} and \code{report()}.
 }
 \examples{
