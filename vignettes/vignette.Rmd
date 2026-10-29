@@ -9,15 +9,17 @@ vignette: >
 
 ```{r setup, include = FALSE}
 # The examples need Java and the JDemetra+ v3 packages
-can_run <- requireNamespace("rjd3x13", quietly = TRUE) &&
-    requireNamespace("rjd3tramoseats", quietly = TRUE) &&
-    requireNamespace("rjd3toolkit", quietly = TRUE) &&
-    isTRUE(rjd3jars::check_java_version(silent = TRUE))
-has_plot <- can_run &&
-    requireNamespace("ggplot2", quietly = TRUE) &&
-    requireNamespace("ggtime", quietly = TRUE)
+requireNamespace("rjd3x13", quietly = TRUE) 
+requireNamespace("rjd3tramoseats", quietly = TRUE)
+requireNamespace("rjd3toolkit", quietly = TRUE) 
+requireNamespace("ggplot2", quietly = TRUE)
+requireNamespace("ggtime", quietly = TRUE)
 
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = can_run)
+knitr::opts_chunk$set(
+    collapse = TRUE, 
+    comment = "#>", 
+    eval = rjd3jars::check_java_version(silent = TRUE)
+    )
 ```
 
 ## Introduction
