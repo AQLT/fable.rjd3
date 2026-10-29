@@ -24,7 +24,8 @@ type, estimate and test statistics of the outliers are available in
 }
 \description{
 Returns the outlying observations detected (or specified) in the
-pre-adjustment model of a model fitted with \code{\link[=X13]{X13()}} or \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}:
+pre-adjustment model of a model fitted with \code{\link[=X13]{X13()}}, \code{\link[=TRAMOSEATS]{TRAMOSEATS()}},
+\code{\link[=REGARIMA]{REGARIMA()}} or \code{\link[=TRAMO]{TRAMO()}}:
 additive outliers (AO), level shifts (LS), transitory changes (TC) and
 seasonal outliers (SO). An outlier is dated at one observation, even when
 its effect (e.g. a level shift) lasts longer.

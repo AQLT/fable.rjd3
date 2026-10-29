@@ -40,8 +40,11 @@ columns of the tsibble and added to the context.
 
 \section{Precedence}{
 
-The base \code{spec} is applied first, then the specials (in the order above,
-\code{jd3()} last), then \code{xreg()}. Later settings override earlier ones.
+The base \code{spec} is applied first, then the specials in a fixed order (basic,
+transform, estimate, automodel, outlier, add_outlier, easter, tradingdays,
+arima, ramp, usrdefvar, benchmarking, x11, seats), then \code{xreg()}. Later
+settings override earlier ones. A special that does not apply to the method
+(e.g. \code{x11()} in \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}) is ignored with a warning.
 }
 
 \seealso{

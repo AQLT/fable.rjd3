@@ -17,7 +17,7 @@ jd3_fit_item <- function(jsai, sap, name, ctx) {
     }
 
     y   <- rjd3workspace::get_raw_data(jsai)                  # ts (CHECK)
-    dat <- tibble::as_tibble(tsibble::as_tsibble(y))          # columns: index, value
+    dat <- ts_to_tbl(y)                                       # columns: index, value
     dat$sap    <- sap
     dat$series <- name
     dat <- tsibble::as_tsibble(dat, index = "index", key = c("sap", "series"))
@@ -132,8 +132,7 @@ jd3_context_vars <- function(ctx) {
 
 # Returns list(items =, context =): each item gets `spec`, `ref_spec` and
 # `context` (renamed if needed) and `renamed` (logical); `context` is the single
-# context of the workspace. If `check`, every renamed model is re-estimated and
-# its seasonally adjusted series compared with the original one.
+# context of the workspace.
 #' @keywords internal
 #' @noRd
 jd3_unify_contexts <- function(items) {
@@ -228,7 +227,7 @@ jd3_collect_models <- function(mb, sap, series) {
         for (i in seq_along(mb[[m]])) {
             fit <- jd3_model(mb[[m]][[i]])
             if (!inherits(fit, "jd3_model")) {
-                rlang::warn(sprintf("Row %d of column `%s` is not a fablejd3 model: skipped.", i, m))
+                rlang::warn(sprintf("Row %d of column `%s` is not a fable.rjd3 model: skipped.", i, m))
                 next
             }
             sap_nm <- if (sap %in% names(keys)) as.character(keys[[sap]][i]) else "SAProcessing-1"
@@ -242,7 +241,7 @@ jd3_collect_models <- function(mb, sap, series) {
             out[[length(out) + 1L]] <- list(sap = sap_nm, series = sai_nm, model = fit)
         }
     }
-    if (length(out) == 0L) abort("No fablejd3 model found in the mable.")
+    if (length(out) == 0L) abort("No fable.rjd3 model found in the mable.")
     out
 }
 
@@ -258,6 +257,8 @@ jd3_collect_models <- function(mb, sap, series) {
 #'
 #' @param mb A mable of models fitted with [X13()] or [TRAMOSEATS()].
 #' @param file Path of the workspace (xml master file) to create.
+#' @param replace Replace the workspace if `file` already exists. By default an
+#'   existing file is never overwritten.
 #' @param sap,series Names of the key columns giving the SA-processing and the
 #'   SA-item. Without them, a single SA-processing is created and the SA-item
 #'   names are built from the other keys.
@@ -270,9 +271,11 @@ jd3_collect_models <- function(mb, sap, series) {
 #' export_jws(mb, tempfile(fileext = ".xml"))
 #' @export
 export_jws <- function(
-        mb, file, sap = "sap", series = "series"
+        mb, file, replace = FALSE, sap = "sap", series = "series"
 ) {
-    rlang::check_installed("rjd3workspace")
+    if (file.exists(file) && !replace) {
+        abort(sprintf("`%s` already exists. Use `replace = TRUE` to overwrite it.", file))
+    }
     prep  <- jd3_unify_contexts(jd3_collect_models(mb, sap, series))
     items <- prep$items
 
@@ -289,7 +292,7 @@ export_jws <- function(
             rjd3workspace::set_reference_specification(sp, idx, it$ref_spec)
         }
     }
-    rjd3workspace::save_workspace(jws, file, replace = TRUE, verbose = FALSE)
+    rjd3workspace::save_workspace(jws, file, replace = replace, verbose = FALSE)
     invisible(file)
 }
 

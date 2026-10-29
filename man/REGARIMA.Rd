@@ -16,44 +16,48 @@ REGARIMA(
 \item{formula}{Model formula: the name of the variable to adjust (\code{y}), or
 \code{y ~ specials} (see \link{jd3_specials}).}
 
-\item{spec}{Base specification: a character name or a
-specification object from \code{\link[rjd3x13:regarima_spec]{rjd3x13::regarima_spec()}}.}
+\item{spec}{Base specification: a character name (see
+\code{\link[rjd3x13:regarima_spec]{rjd3x13::regarima_spec()}} for the available names; the default is the
+first one) or a specification object from \code{\link[rjd3x13:regarima_spec]{rjd3x13::regarima_spec()}}.}
 
 \item{context}{A modelling context created with
 \code{\link[rjd3toolkit:modelling_context]{rjd3toolkit::modelling_context()}} (e.g. for custom calendars), or \code{NULL}.}
 
-\item{ref_spec}{Reference specification: the base specification modifyed by the specials.
-Defaults to \code{spec}.}
+\item{ref_spec}{Reference specification stored in the model: it is the
+reference of the refresh policies used by \code{refit()} and \code{stream()}.
+Defaults to \code{spec}, that is the specification before its modification by
+the specials.}
 
 \item{...}{Currently unused.}
 }
 \value{
 A model definition that can be passed to \code{\link[fabletools:model]{fabletools::model()}}. Once
-fitted, the mable column contains a \code{jd3_model} object. Use
-\link[=jd3_model_methods]{components()} to get the decomposition as a \code{dable}
-(columns \code{trend}, \code{seasonal}, \code{irregular} and \code{season_adjust}).
+fitted, the mable column contains a \code{jd3_model} object.
 }
 \description{
-Defines a Reg-ARIMA model (pre-adjustment model used in X-13)
-to be used inside \code{\link[fabletools:model]{fabletools::model()}}. The
-model is estimated with \code{\link[rjd3x13:jregarima]{rjd3x13::jregarima()}} and the Java result
-is kept in the fitted model. Arguments and specials are the same as for
-\code{\link[=X13]{X13()}}.
+Defines a Reg-ARIMA model (the pre-adjustment model used in X-13), without
+seasonal adjustment, to be used inside \code{\link[fabletools:model]{fabletools::model()}}. The model is
+estimated with \code{\link[rjd3x13:jregarima]{rjd3x13::jregarima()}} and the Java result is kept in the
+fitted model. Arguments and specials are the same as for \code{\link[=X13]{X13()}}, except
+\code{x11()}, \code{seats()} and \code{benchmarking()}, which do not apply and are ignored
+with a warning.
+}
+\details{
+There is no decomposition, so \code{components()} is not available. The other
+methods are: \code{fitted()}, \code{residuals()}, \code{forecast()}, \code{backast()},
+\code{outliers()}, \code{tidy()}, \code{glance()} and \code{report()}.
 }
 \examples{
 \dontshow{if (rjd3jars::check_java_version(silent = TRUE)) withAutoprint(\{ # examplesIf}
 y <- tsibble::as_tsibble(AirPassengers)
+mb <- model(y, regarima = REGARIMA(value))
+tidy(mb)
+report(mb)
 
-mb <- model(y, ts = TRAMOSEATS(value))
-components(mb)
-
-# Fit both methods side by side and plot the seasonally adjusted series
-mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
-  autoplot(components(mb))
-}
+# Forecasts of the raw series
+forecast(mb, h = 12)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=X13]{X13()}}, \link{jd3_specials}, \link{jd3_model_methods}
+\code{\link[=X13]{X13()}}, \code{\link[=TRAMO]{TRAMO()}}, \link{jd3_specials}, \link{jd3_model_methods}
 }

@@ -7,15 +7,18 @@
 \title{fable.rjd3: 'fabletools' Interface to JDemetra+ v3 Seasonal Adjustment}
 \description{
 Seasonal adjustment of \code{tsibble} series with X-13ARIMA (\code{\link[=X13]{X13()}}) and
-TRAMO-SEATS (\code{\link[=TRAMOSEATS]{TRAMOSEATS()}}), using the JDemetra+ v3 R packages
-\pkg{rjd3x13} and \pkg{rjd3tramoseats}.
+TRAMO-SEATS (\code{\link[=TRAMOSEATS]{TRAMOSEATS()}}), and their pre-adjustment models Reg-ARIMA
+(\code{\link[=REGARIMA]{REGARIMA()}}) and TRAMO (\code{\link[=TRAMO]{TRAMO()}}), using the JDemetra+ v3 R packages
+\pkg{rjd3x13} and \pkg{rjd3tramoseats}. JDemetra+ workspaces can be imported
+and exported with \code{\link[=import_jws]{import_jws()}} and \code{\link[=export_jws]{export_jws()}}.
 }
 \details{
 Models store the underlying Java object, so any indicator available in
 JDemetra+ can be extracted with \code{\link[=jd3_indicator]{jd3_indicator()}} and listed with
 \code{\link[=jd3_dictionary]{jd3_dictionary()}}. The usual \code{fabletools} verbs work on the fitted
 mable: \link[=jd3_model_methods]{components()}, \link[=jd3_model_methods]{glance()},
-\link[=jd3_model_methods]{tidy()} and \link[=jd3_model_methods]{report()}.
+\link[=jd3_model_methods]{tidy()} and \link[=jd3_model_methods]{report()}, as well as
+\link[=forecast.jd3_model]{forecast()}, \code{\link[=backast]{backast()}} and \link[=outliers.jd3_model]{outliers()}.
 }
 \seealso{
 Useful links:

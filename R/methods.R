@@ -6,9 +6,10 @@
 #'
 #' @param x A `mdl_ts` (e.g. `mb$x13[[1]]`) or a `jd3_model`.
 #'
-#' @return A `jd3_model` object: a list holding the decomposition (`dable`),
-#'   the series, the final specification, the modelling context and a cache for
-#'   the Java result.
+#' @return A `jd3_model` object: a list holding the data (a tsibble), the
+#'   series (`ts`), the final specification (`spec`), the reference
+#'   specification (`ref_spec`), the modelling context, the engine, the name of
+#'   the response and a cache for the Java result.
 #'
 #' @examplesIf rjd3jars::check_java_version(silent = TRUE)
 #' mb <- model(tsibble::as_tsibble(AirPassengers), x13 = X13(value))
@@ -23,14 +24,12 @@ jd3_model <- function(x) {
 
 #' Methods for fitted JDemetra+ models
 #'
-#' Standard `fabletools` / `generics` verbs for models fitted with [X13()] and
-#' [TRAMOSEATS()]. They can be applied directly on a mable.
+#' Standard `fabletools` / `generics` verbs for models fitted with [X13()],
+#' [TRAMOSEATS()], [REGARIMA()] and [TRAMO()]. They can be applied directly on a
+#' mable. `components()` is only available for the seasonal adjustment models
+#' ([X13()] and [TRAMOSEATS()]).
 #'
 #' @param object,x A `jd3_model` (usually accessed through a mable).
-#' @param ids For `glance()`: named or unnamed character vector of indicator ids
-#'   (see [jd3_dictionary()]). If `NULL`, a default set (AIC, AICc, BIC,
-#'   log-likelihood and the M and Q statistics) is used; unavailable
-#'   indicators are returned as `NA`.
 #' @inheritParams stats::printCoefmat
 #' @param thresholds_pval Threshold used to interpret p-values statistic test.
 #' By default `c(Severe = 0.001, Bad = 0.01, Uncertain = 0.05, Good = Inf)`.
@@ -40,10 +39,14 @@ jd3_model <- function(x) {
 #' * `components()`: a `dable` with the response and the columns `trend`,
 #'   `seasonal`, `irregular` and `season_adjust`.
 #' * `glance()`: a one-row tibble of diagnostics.
-#' * `tidy()`: a tibble with columns `term` (indicator id) and `estimate`;
-#'   only scalar numeric indicators are returned.
-#' * `report()`: invisibly, the model; prints the method, the adjustment mode,
-#'   the specification and the diagnostics.
+#' * `tidy()`: a tibble with one row per coefficient (ARIMA parameters,
+#'   regression variables, outliers, calendar effects) and the columns `term`,
+#'   `estimate`, `std.error`, `statistic` and `p.value`. Coefficients fixed in
+#'   the specification are included, with missing standard errors and tests.
+#' * `report()`: invisibly, the model; prints the decomposition mode or the
+#'   transformation, the number of observations, the coefficients, the tests on
+#'   the residuals and, for seasonal adjustment models, the quality diagnostics
+#'   (M and Q statistics, residual seasonality tests on the adjusted series).
 #' * `model_sum()`: a short string describing the model.
 #'
 #' @examplesIf rjd3jars::check_java_version(silent = TRUE)
@@ -180,22 +183,6 @@ get_fixed_coefficients <- function(spec) {
             }
         }))
     }
-
-    if (length(spec$regression$ramps) > 0) {
-        ud_ramps <- do.call(rbind, lapply(spec$regression$ramps, function(ramp){
-            if (is.null(ramp$coef) || ramp$coef$type != "FIXED") {
-                NULL
-            } else {
-                tibble::tibble(
-                    term = ramp$name,
-                    estimate = ramp$coef$value,
-                    std.error = NA_real_,
-                    statistic = NA_real_,
-                    p.value = NA_real_
-                )
-            }
-        }))
-    }
     if (length(spec$regression$users) > 0) {
         ud_users <- do.call(rbind, lapply(spec$regression$users, function(x){
             if (is.null(x$coef) || x$coef$type != "FIXED") {
@@ -257,7 +244,7 @@ get_arima_coef <- function(jres){
             statistic = double(), p.value = double()
         )
     } else {
-        coef_arima
+        tibble::as_tibble(coef_arima)
     }
 
 }
@@ -312,11 +299,11 @@ tidy.jd3_model <- function(x, ...) {
         p.value = 2 * stats::pt(abs(t), df, lower.tail = FALSE)
     )
 
-    rbind(
+    tibble::as_tibble(rbind(
         coef_arima,
         est_coeff,
         fixed_coeff
-    )
+    ))
 }
 
 #' @rdname jd3_model_methods
@@ -329,7 +316,9 @@ report.jd3_model <- function(
         ...) {
     jres <- get_jres(object)
     arima_model <- jget_arima_model(jres)
-    reg_coef <- tidy(object)
+    # a data frame, not a tibble: the terms are used as row names below, and
+    # tibbles do not support row names
+    reg_coef <- as.data.frame(tidy(object))
     colnames(reg_coef)[-1] <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
     rownames(reg_coef) <- make.unique(reg_coef$term)
     reg_coef$term <- NULL
@@ -347,13 +336,17 @@ report.jd3_model <- function(
     cat("; N obs.:", rjd3toolkit::result(jres, "span.n"), "\n")
 
     cat("\n\nCoefficients\n")
-    cat(utils::capture.output(
-        stats::printCoefmat(
-            reg_coef, digits = digits,
-            signif.stars = signif.stars, na.print = "NA"
-        )),
-        sep = "\n"
-    )
+    if (nrow(reg_coef) == 0L) {
+        cat("No coefficient\n")
+    } else {
+        cat(utils::capture.output(
+            stats::printCoefmat(
+                reg_coef, digits = digits,
+                signif.stars = signif.stars, na.print = "NA"
+            )),
+            sep = "\n"
+        )
+    }
 
     cat("\n")
     lb <- rjd3toolkit::result(jres, "residuals.lb")$pvalue
@@ -427,8 +420,8 @@ report.jd3_model <- function(
 
 #' Fitted values, residuals, interpolation and updating of JDemetra+ models
 #'
-#' Methods for models fitted with [X13()] or [TRAMOSEATS()]. They can be applied
-#' directly on a mable.
+#' Methods for models fitted with [X13()], [TRAMOSEATS()], [REGARIMA()] or
+#' [TRAMO()]. They can be applied directly on a mable.
 #'
 #' @details
 #' * `fitted()` returns the one-step-ahead fitted values of the pre-adjustment
@@ -444,7 +437,8 @@ report.jd3_model <- function(
 #' * `refit()` applies the model to new data, using a JDemetra+ refresh policy
 #'   (see [rjd3x13::x13_refresh()] and [rjd3tramoseats::tramoseats_refresh()]):
 #'   the specification is refreshed from the estimated model and the
-#'   reference specification `ref_spec`.
+#'   reference specification stored in the model (see the `ref_spec` argument
+#'   of [X13()]).
 #' * `stream()` appends new observations to the data of the model and refreshes
 #'   it in the same way. `new_data` contains the new observations only.
 #'
@@ -556,7 +550,13 @@ interpolate.jd3_model <- function(object, new_data = NULL, specials = NULL, ...)
             jres,
             "yc"
         )
-        out[[resp]] <- as.numeric(interpolate_d)
+        # `yc` can be shorter than the series (e.g. series span): align it
+        interpolate_d <- as.numeric(stats::window(
+            interpolate_d,
+            start = stats::start(object$y), end = stats::end(object$y),
+            extend = TRUE
+        ))
+        out[[resp]][miss] <- interpolate_d[miss]
     }
     out
 }
@@ -592,13 +592,6 @@ jd3_refit_impl <- function(
         ref_spec = object$ref_spec,
         context = object$context,
         engine =  object$engine,
-        name = class(object)[1],
-        extra_class = class(object)[-1]
-    )
-    make_jd3_model(
-        .data, jres, spec,
-        object$context,
-        object$engine,
         name = class(object)[1],
         extra_class = class(object)[-1]
     )
@@ -699,7 +692,7 @@ stream.jd3_model <- function(
     new  <- tibble::as_tibble(new_data)[c(idx, resp)]
 
     # the new observations must follow the series immediately
-    if (min(new[[idx]]) != max(old[[idx]]) + 1) {
+    if (min(new[[idx]]) != max(old[[idx]]) + jd3_step_units(old[[idx]])) {
         abort("`new_data` must start right after the end of the data of the model.")
     }
     full <- tsibble::as_tsibble(rbind(old, new), index = idx)

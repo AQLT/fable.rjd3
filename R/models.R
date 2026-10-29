@@ -167,10 +167,14 @@ train_jd3 <- function(
 #'
 #' @param formula Model formula: the name of the variable to adjust (`y`), or
 #'   `y ~ specials` (see [jd3_specials]).
-#' @param spec Estimate specification: a character name or a
-#'   specification object from [rjd3x13::x13_spec()].
-#' @param ref_spec Reference specification: the base specification modifyed by the specials.
-#' Defaults to `spec`.
+#' @param spec Base specification: a character name (see [rjd3x13::x13_spec()]
+#'   for the available names; the default is the first one) or a specification
+#'   object from [rjd3x13::x13_spec()]. The specials of the formula are applied
+#'   to it.
+#' @param ref_spec Reference specification stored in the model: it is the
+#'   reference of the refresh policies used by `refit()` and `stream()`.
+#'   Defaults to `spec`, that is the specification before its modification by
+#'   the specials.
 #' @param context A modelling context created with
 #'   [rjd3toolkit::modelling_context()] (e.g. for custom calendars), or `NULL`.
 #' @param ... Currently unused.
@@ -243,7 +247,7 @@ train_x13 <- function(
 #' TRAMO-SEATS seasonal adjustment (JDemetra+ v3)
 #'
 #' Defines a TRAMO-SEATS model to be used inside [fabletools::model()]. The
-#' model is estimated with [rjd3tramoseats::.jtramoseats()] and the Java result
+#' model is estimated with `rjd3tramoseats::jtramoseats()` and the Java result
 #' is kept in the fitted model. Arguments and specials are the same as for
 #' [X13()].
 #'
@@ -267,7 +271,7 @@ train_x13 <- function(
 #' # Fit both methods side by side and plot the seasonally adjusted series
 #' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
 #' if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
-#'   autoplot(components(mb))
+#'   ggplot2::autoplot(components(mb))
 #' }
 #' @export
 TRAMOSEATS <- function(
@@ -308,34 +312,35 @@ train_tramoseats <- function(
 
 #' Reg-ARIMA Model
 #'
-#' Defines a Reg-ARIMA model (pre-adjustment model used in X-13)
-#' to be used inside [fabletools::model()]. The
-#' model is estimated with [rjd3x13::jregarima()] and the Java result
-#' is kept in the fitted model. Arguments and specials are the same as for
-#' [X13()].
+#' Defines a Reg-ARIMA model (the pre-adjustment model used in X-13), without
+#' seasonal adjustment, to be used inside [fabletools::model()]. The model is
+#' estimated with [rjd3x13::jregarima()] and the Java result is kept in the
+#' fitted model. Arguments and specials are the same as for [X13()], except
+#' `x11()`, `seats()` and `benchmarking()`, which do not apply and are ignored
+#' with a warning.
+#'
+#' There is no decomposition, so `components()` is not available. The other
+#' methods are: `fitted()`, `residuals()`, `forecast()`, `backast()`,
+#' `outliers()`, `tidy()`, `glance()` and `report()`.
 #'
 #' @inheritParams X13
-#' @param spec Base specification: a character name or a
-#'   specification object from [rjd3x13::regarima_spec()].
+#' @param spec Base specification: a character name (see
+#'   [rjd3x13::regarima_spec()] for the available names; the default is the
+#'   first one) or a specification object from [rjd3x13::regarima_spec()].
 #'
 #' @return A model definition that can be passed to [fabletools::model()]. Once
-#'   fitted, the mable column contains a `jd3_model` object. Use
-#'   [components()][jd3_model_methods] to get the decomposition as a `dable`
-#'   (columns `trend`, `seasonal`, `irregular` and `season_adjust`).
+#'   fitted, the mable column contains a `jd3_model` object.
 #'
-#' @seealso [X13()], [jd3_specials], [jd3_model_methods]
+#' @seealso [X13()], [TRAMO()], [jd3_specials], [jd3_model_methods]
 #'
 #' @examplesIf rjd3jars::check_java_version(silent = TRUE)
 #' y <- tsibble::as_tsibble(AirPassengers)
+#' mb <- model(y, regarima = REGARIMA(value))
+#' tidy(mb)
+#' report(mb)
 #'
-#' mb <- model(y, ts = TRAMOSEATS(value))
-#' components(mb)
-#'
-#' # Fit both methods side by side and plot the seasonally adjusted series
-#' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-#' if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
-#'   autoplot(components(mb))
-#' }
+#' # Forecasts of the raw series
+#' forecast(mb, h = 12)
 #' @export
 REGARIMA <- function(
         formula, spec = c("rg4", "rg0", "rg1", "rg2c", "rg3", "rg5c"),
@@ -371,34 +376,35 @@ train_regarima <- function(
 
 #' TRAMO Model
 #'
-#' Defines a TRAMO model (pre-adjustment model used in TRAMO-SEATS)
-#' to be used inside [fabletools::model()]. The
-#' model is estimated with [rjd3tramoseats::jtramo()] and the Java result
-#' is kept in the fitted model. Arguments and specials are the same as for
-#' [TRAMOSEATS()].
+#' Defines a TRAMO model (the pre-adjustment model used in TRAMO-SEATS), without
+#' seasonal adjustment, to be used inside [fabletools::model()]. The model is
+#' estimated with [rjd3tramoseats::jtramo()] and the Java result is kept in the
+#' fitted model. Arguments and specials are the same as for [TRAMOSEATS()],
+#' except `x11()`, `seats()` and `benchmarking()`, which do not apply and are
+#' ignored with a warning.
+#'
+#' There is no decomposition, so `components()` is not available. The other
+#' methods are: `fitted()`, `residuals()`, `forecast()`, `backast()`,
+#' `outliers()`, `tidy()`, `glance()` and `report()`.
 #'
 #' @inheritParams X13
-#' @param spec Base specification: a character name or a
-#'   specification object from [rjd3tramoseats::tramo_spec()].
+#' @param spec Base specification: a character name (see
+#'   [rjd3tramoseats::tramo_spec()] for the available names; the default is the
+#'   first one) or a specification object from [rjd3tramoseats::tramo_spec()].
 #'
 #' @return A model definition that can be passed to [fabletools::model()]. Once
-#'   fitted, the mable column contains a `jd3_model` object. Use
-#'   [components()][jd3_model_methods] to get the decomposition as a `dable`
-#'   (columns `trend`, `seasonal`, `irregular` and `season_adjust`).
+#'   fitted, the mable column contains a `jd3_model` object.
 #'
-#' @seealso [TRAMOSEATS()], [jd3_specials], [jd3_model_methods]
+#' @seealso [TRAMOSEATS()], [REGARIMA()], [jd3_specials], [jd3_model_methods]
 #'
 #' @examplesIf rjd3jars::check_java_version(silent = TRUE)
 #' y <- tsibble::as_tsibble(AirPassengers)
+#' mb <- model(y, tramo = TRAMO(value))
+#' tidy(mb)
+#' report(mb)
 #'
-#' mb <- model(y, ts = TRAMOSEATS(value))
-#' components(mb)
-#'
-#' # Fit both methods side by side and plot the seasonally adjusted series
-#' mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
-#' if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
-#'   autoplot(components(mb))
-#' }
+#' # Forecasts of the raw series
+#' forecast(mb, h = 12)
 #' @export
 TRAMO <- function(
         formula,

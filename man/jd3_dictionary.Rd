@@ -21,8 +21,9 @@ jd3_dictionary(object, ...)
 \item{...}{Currently unused.}
 }
 \value{
-A character vector of indicator ids.
-For a mable, the dictionary of the first model is returned.
+A data frame (class \code{JD3_FULL_DICTIONARY}) with one row per
+indicator: its id (\code{name}), description and output type. For a mable, the
+dictionary of the first model is returned.
 }
 \description{
 Wraps \code{\link[rjd3toolkit:dictionary]{rjd3toolkit::dictionary()}} on the Java result of the model. The

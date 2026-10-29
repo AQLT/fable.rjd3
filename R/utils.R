@@ -1,4 +1,33 @@
 
+# Number of months between two consecutive observations of an index:
+# 1 monthly, 2 bimonthly, 3 quarterly, 4 four-monthly, 6 semi-annual, 12 annual.
+#' @keywords internal
+#' @noRd
+jd3_step_months <- function(idx) {
+  d <- as.Date(idx)
+  m <- as.integer(format(d, "%Y")) * 12L + as.integer(format(d, "%m"))
+  step <- unique(diff(m))
+  if (length(step) != 1L) {
+    abort("The series must be regular: at least two observations and a constant interval are required.")
+  }
+  if (12L %% step != 0L) {
+    abort(sprintf("The interval between observations (%d months) must divide a year.", step))
+  }
+  step
+}
+
+# Step of an index in its own unit (months for yearmonth, quarters for yearquarter):
+# the number to add to a date to get the next observation.
+#' @keywords internal
+#' @noRd
+jd3_step_units <- function(idx) {
+  step <- jd3_step_months(idx)
+  if (inherits(idx, "yearquarter")) step %/% 3L else step
+}
+
+# The frequency is deduced from the interval, not from the class of the index: a
+# `yearmonth` index with a step of 2 months is a bimonthly series (frequency 6),
+# with a step of 6 months a semi-annual series (frequency 2).
 #' @keywords internal
 #' @noRd
 tsibble_to_ts <- function(.data) {
@@ -7,19 +36,44 @@ tsibble_to_ts <- function(.data) {
     abort("Seasonal adjustment only applies to a single (univariate) series.")
   }
   idx <- .data[[tsibble::index_var(.data)]]
-  d   <- as.Date(idx[1])
-  yr  <- as.integer(format(d, "%Y"))
-  mo  <- as.integer(format(d, "%m"))
-
-  if (inherits(idx, "yearmonth")) {
-    freq <- 12L; start <- c(yr, mo)
-  } else if (inherits(idx, "yearquarter")) {
-    freq <- 4L;  start <- c(yr, (mo - 1L) %/% 3L + 1L)
-  } else {
-    abort("The index must be of class `yearmonth` or `yearquarter`.")
+  if (!inherits(idx, c("yearmonth", "yearquarter"))) {
+    abort(paste0("The index must be of class `yearmonth` or `yearquarter`, with an ",
+                 "interval dividing a year (monthly, bimonthly, quarterly, ",
+                 "four-monthly or semi-annual series)."))
   }
-  list(ts = stats::ts(.data[[measures]], start = start, frequency = freq),
+  step <- jd3_step_months(idx)
+  freq <- 12L %/% step
+
+  d  <- as.Date(idx[1])
+  yr <- as.integer(format(d, "%Y"))
+  mo <- as.integer(format(d, "%m"))
+  if ((mo - 1L) %% step != 0L) {
+    abort(sprintf(
+      "With an interval of %d months, the first observation must be in month %s.",
+      step, paste(seq(1L, 12L, by = step), collapse = ", ")
+    ))
+  }
+  list(ts = stats::ts(.data[[measures]], start = c(yr, (mo - 1L) %/% step + 1L),
+                      frequency = freq),
        measure = measures)
+}
+
+# A `ts` (frequency 1, 2, 3, 4, 6 or 12) as a tibble with columns `index`
+# (yearquarter if quarterly, yearmonth otherwise) and `value`.
+#' @keywords internal
+#' @noRd
+ts_to_tbl <- function(x) {
+  f <- stats::frequency(x)
+  if (f < 1 || 12 %% f != 0) {
+    abort(sprintf("A frequency of %s is not supported: it must divide 12.", f))
+  }
+  st <- stats::start(x)
+  k  <- seq_along(x) - 1 + (st[2L] - 1)                 # 0-based period count
+  yr <- st[1L] + k %/% f
+  mo <- (k %% f) * (12 / f) + 1
+  d  <- as.Date(sprintf("%d-%02d-01", as.integer(yr), as.integer(mo)))
+  idx <- if (f == 4) tsibble::yearquarter(d) else tsibble::yearmonth(d)
+  tibble::tibble(index = idx, value = as.numeric(x))
 }
 
 #' @keywords internal
@@ -83,7 +137,8 @@ thresholds <- function(x, thresholds_pval = getOption("fable.rjd3.thresholds_pva
     base::cut(
         x,
         breaks = c(0, thresholds_pval),
-        labels = names(thresholds_pval)
+        labels = names(thresholds_pval),
+        include.lowest = TRUE      # a p-value of exactly 0 belongs to the first class
         )
 }
 

@@ -1,13 +1,3 @@
-# ==============================================================================
-# jd3_indicator() : roxygen block of the generic and new mdl_df method.
-# The methods for `jd3_model` and `mdl_ts` are unchanged (raw object returned by
-# rjd3toolkit::result()).
-#
-# WHY: an indicator can be a number, a `ts`, a test (JD3_TEST), a matrix... A
-# list-column holds anything but is awkward to use, so the mable method now
-# simplifies when all the values have the same simple shape.
-# ==============================================================================
-
 #' Extract any JDemetra+ indicator from a fitted model
 #'
 #' Wraps [rjd3toolkit::result()] on the Java result of the model. If the Java
@@ -28,7 +18,7 @@
 #' For a mable, a tibble with the key columns, `.model`, `id` and:
 #'   * numbers or strings: a column `value`;
 #'   * `ts` series: one row per date, with columns `index` and `value`;
-#'   * tests: columns `statistic` and `p.value`;
+#'   * tests: columns `statistic`, `p.value` and `distribution`;
 #'   * anything else (or `simplify = FALSE`): a list-column `value` with one
 #'     element per model.
 #' With several ids (or `drop = FALSE`), a named list of such tibbles, one per id.
@@ -111,7 +101,7 @@ jd3_indicator.mdl_df <- function(object, id, simplify = TRUE, drop = TRUE, ...) 
         # univariate time series: long format
         if (all(vapply(vals, function(v) is.ts(v) && is.null(dim(v)), logical(1)))) {
             out <- do.call(rbind, lapply(seq_along(items), function(k) {
-                d   <- tibble::as_tibble(tsibble::as_tsibble(vals[[k]]))
+                d   <- ts_to_tbl(vals[[k]])
                 res <- head_cols(items[[k]], nrow(d))
                 res$index <- d[[1]]
                 res$value <- d[[2]]
@@ -155,12 +145,12 @@ jd3_flatten <- function(v, name) {
 
 
 #' @param ids For `glance()`: named or unnamed character vector of indicator ids
-#'   (see [jd3_dictionary()]); the names become the column names. Numeric
-#'   indicators give one column; tests give two columns, `<name>_stat` and
-#'   `<name>_pvalue`; other indicators give `NA`. If `NULL`, a default set is
-#'   used (information criteria, number of observations, residual tests and,
-#'   for X-13 only, the M and Q statistics); ids that are not available for the
-#'   method are dropped.
+#'   (see [jd3_dictionary()]); the names become the column names. Numbers and
+#'   strings give one column; tests give two columns, `<name>_stat` and
+#'   `<name>_pvalue`; other indicators give `NA`. If `NULL`, the default set of
+#'   the method is used (information criteria, number of observations, tests on
+#'   the residuals and on the seasonally adjusted series, M and Q statistics
+#'   for X-13, SEATS tests for TRAMO-SEATS).
 #' @rdname jd3_model_methods
 #' @export
 glance.jd3_model <- function(x, ids = NULL, ...) {
@@ -174,7 +164,7 @@ glance.jd3_model <- function(x, ids = NULL, ...) {
 
     vals <- jd3_indicator(x, unname(ids), drop = FALSE)
     indicators <- lapply(seq_along(ids), function(k) {
-        jd3_flatten(vals[[k]], names(ids)[k])
+        jd3_flatten(vals[[unname(ids)[k]]], names(ids)[k])
     })
     indicators <- indicators[lengths(indicators) > 0]
     flat <- unlist(indicators, recursive = FALSE)
@@ -187,8 +177,9 @@ glance.jd3_model <- function(x, ids = NULL, ...) {
 #'
 #' @inheritParams jd3_indicator
 #'
-#' @return A character vector of indicator ids.
-#' For a mable, the dictionary of the first model is returned.
+#' @return A data frame (class `JD3_FULL_DICTIONARY`) with one row per
+#'   indicator: its id (`name`), description and output type. For a mable, the
+#'   dictionary of the first model is returned.
 #'
 #' @seealso [jd3_indicator()]
 #' @examplesIf rjd3jars::check_java_version(silent = TRUE)

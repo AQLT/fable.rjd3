@@ -4,12 +4,15 @@
 \alias{export_jws}
 \title{Export a mable of JDemetra+ models as a new workspace}
 \usage{
-export_jws(mb, file, sap = "sap", series = "series")
+export_jws(mb, file, replace = FALSE, sap = "sap", series = "series")
 }
 \arguments{
 \item{mb}{A mable of models fitted with \code{\link[=X13]{X13()}} or \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}.}
 
 \item{file}{Path of the workspace (xml master file) to create.}
+
+\item{replace}{Replace the workspace if \code{file} already exists. By default an
+existing file is never overwritten.}
 
 \item{sap, series}{Names of the key columns giving the SA-processing and the
 SA-item. Without them, a single SA-processing is created and the SA-item

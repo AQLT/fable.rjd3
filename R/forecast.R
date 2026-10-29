@@ -58,7 +58,7 @@ jd3_sdlog_from_sd <- function(sd, m) {
 #' Forecast of the raw series
 #'
 #' Forecasts the raw series from the pre-adjustment model (RegARIMA / TRAMO)
-#' of a model fitted with [X13()] or [TRAMOSEATS()]. The values are read from
+#' of a model fitted with [X13()], [TRAMOSEATS()], [REGARIMA()] or [TRAMO()]. The values are read from
 #' the stored JDemetra+ result, so the seasonal adjustment itself is not
 #' affected. For the past, see [backast()].
 #'
@@ -125,8 +125,8 @@ forecast.jd3_model <- function(object, new_data = NULL, ...) {
 #' Backcast of the raw series
 #'
 #' Backcasts the raw series, i.e. predicts the periods preceding its start,
-#' from the pre-adjustment model of a model fitted with [X13()] or
-#' [TRAMOSEATS()]. \pkg{fabletools} has no backcast generic, so this function
+#' from the pre-adjustment model of a model fitted with [X13()], [TRAMOSEATS()],
+#' [REGARIMA()] or [TRAMO()]. \pkg{fabletools} has no backcast generic, so this function
 #' plays the role of [forecast()][forecast.jd3_model] for the past. The distribution
 #' is built as for forecasts (log-normal for log-transformed series, normal
 #' otherwise; see the *Distribution* section of [forecast.jd3_model]).
@@ -135,7 +135,7 @@ forecast.jd3_model <- function(object, new_data = NULL, ...) {
 #' @param h Number of periods to backcast, immediately before the start of the
 #'   series.
 #'
-#' @return For a `jd3_model` or a `mdl_ts`, a tsibble with the `n` dates
+#' @return For a `jd3_model` or a `mdl_ts`, a tsibble with the `h` dates
 #'   preceding the series and a distribution column `dist` (see
 #'   \pkg{distributional}). For a mable, a tibble with the key columns, `.model`,
 #'   the dates and `dist`, one block per model. Use `mean()` or `median()` on
@@ -184,7 +184,9 @@ backast.jd3_model <- function(object, h, ...) {
     }
     idx   <- tsibble::index_var(object$data)
     first <- min(object$data[[idx]])
-    out   <- tibble::tibble(!!idx := first - rev(seq_len(h)), dist = dist)
+    # one period = one interval of the index (e.g. 2 months for a bimonthly series)
+    step  <- jd3_step_units(object$data[[idx]])
+    out   <- tibble::tibble(!!idx := first - rev(seq_len(h)) * step, dist = dist)
     tsibble::as_tsibble(out, index = !!rlang::sym(idx))
 }
 

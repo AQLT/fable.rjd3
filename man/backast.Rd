@@ -24,7 +24,7 @@ series.}
 \item{...}{Other arguments passed by \code{forecast()} (e.g. \code{times}), ignored.}
 }
 \value{
-For a \code{jd3_model} or a \code{mdl_ts}, a tsibble with the \code{n} dates
+For a \code{jd3_model} or a \code{mdl_ts}, a tsibble with the \code{h} dates
 preceding the series and a distribution column \code{dist} (see
 \pkg{distributional}). For a mable, a tibble with the key columns, \code{.model},
 the dates and \code{dist}, one block per model. Use \code{mean()} or \code{median()} on
@@ -32,8 +32,8 @@ the dates and \code{dist}, one block per model. Use \code{mean()} or \code{media
 }
 \description{
 Backcasts the raw series, i.e. predicts the periods preceding its start,
-from the pre-adjustment model of a model fitted with \code{\link[=X13]{X13()}} or
-\code{\link[=TRAMOSEATS]{TRAMOSEATS()}}. \pkg{fabletools} has no backcast generic, so this function
+from the pre-adjustment model of a model fitted with \code{\link[=X13]{X13()}}, \code{\link[=TRAMOSEATS]{TRAMOSEATS()}},
+\code{\link[=REGARIMA]{REGARIMA()}} or \code{\link[=TRAMO]{TRAMO()}}. \pkg{fabletools} has no backcast generic, so this function
 plays the role of \link[=forecast.jd3_model]{forecast()} for the past. The distribution
 is built as for forecasts (log-normal for log-transformed series, normal
 otherwise; see the \emph{Distribution} section of \link{forecast.jd3_model}).

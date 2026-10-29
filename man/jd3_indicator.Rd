@@ -38,7 +38,7 @@ For a mable, a tibble with the key columns, \code{.model}, \code{id} and:
 \itemize{
 \item numbers or strings: a column \code{value};
 \item \code{ts} series: one row per date, with columns \code{index} and \code{value};
-\item tests: columns \code{statistic} and \code{p.value};
+\item tests: columns \code{statistic}, \code{p.value} and \code{distribution};
 \item anything else (or \code{simplify = FALSE}): a list-column \code{value} with one
 element per model.
 With several ids (or \code{drop = FALSE}), a named list of such tibbles, one per id.

@@ -1,13 +1,13 @@
 # ==============================================================================
-# R/reexports.R : functions re-exported so that users only need library(fable.rjd3)
+# R/reexported.R : functions re-exported so that users only need library(fable.rjd3)
 #
 # Origin of each generic (CHECK with the snippet at the end of the file: a wrong
 # origin makes devtools::document() fail with "'x' is not an exported object
 # from 'namespace:pkg'"; just move the line to the right section).
 #
-# Re-exported objects are identical to the originals, so loading fablejd3 and
+# Re-exported objects are identical to the originals, so loading fable.rjd3 and
 # fabletools / fpp3 together gives no "masked from" warnings.
-# DESCRIPTION: fabletools, generics, ggplot2, distributional, tsibble in Imports.
+# DESCRIPTION: fabletools, generics, tsibble in Imports.
 # ==============================================================================
 
 # --- fabletools -----------------------------------------------------------------

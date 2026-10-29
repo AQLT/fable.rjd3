@@ -27,9 +27,12 @@
 }
 \arguments{
 \item{ids}{For \code{glance()}: named or unnamed character vector of indicator ids
-(see \code{\link[=jd3_dictionary]{jd3_dictionary()}}). If \code{NULL}, a default set (AIC, AICc, BIC,
-log-likelihood and the M and Q statistics) is used; unavailable
-indicators are returned as \code{NA}.}
+(see \code{\link[=jd3_dictionary]{jd3_dictionary()}}); the names become the column names. Numbers and
+strings give one column; tests give two columns, \verb{<name>_stat} and
+\verb{<name>_pvalue}; other indicators give \code{NA}. If \code{NULL}, the default set of
+the method is used (information criteria, number of observations, tests on
+the residuals and on the seasonally adjusted series, M and Q statistics
+for X-13, SEATS tests for TRAMO-SEATS).}
 
 \item{...}{Currently unused.}
 
@@ -51,16 +54,22 @@ By default \code{c(Severe = 0.001, Bad = 0.01, Uncertain = 0.05, Good = Inf)}.}
 \item \code{components()}: a \code{dable} with the response and the columns \code{trend},
 \code{seasonal}, \code{irregular} and \code{season_adjust}.
 \item \code{glance()}: a one-row tibble of diagnostics.
-\item \code{tidy()}: a tibble with columns \code{term} (indicator id) and \code{estimate};
-only scalar numeric indicators are returned.
-\item \code{report()}: invisibly, the model; prints the method, the adjustment mode,
-the specification and the diagnostics.
+\item \code{tidy()}: a tibble with one row per coefficient (ARIMA parameters,
+regression variables, outliers, calendar effects) and the columns \code{term},
+\code{estimate}, \code{std.error}, \code{statistic} and \code{p.value}. Coefficients fixed in
+the specification are included, with missing standard errors and tests.
+\item \code{report()}: invisibly, the model; prints the decomposition mode or the
+transformation, the number of observations, the coefficients, the tests on
+the residuals and, for seasonal adjustment models, the quality diagnostics
+(M and Q statistics, residual seasonality tests on the adjusted series).
 \item \code{model_sum()}: a short string describing the model.
 }
 }
 \description{
-Standard \code{fabletools} / \code{generics} verbs for models fitted with \code{\link[=X13]{X13()}} and
-\code{\link[=TRAMOSEATS]{TRAMOSEATS()}}. They can be applied directly on a mable.
+Standard \code{fabletools} / \code{generics} verbs for models fitted with \code{\link[=X13]{X13()}},
+\code{\link[=TRAMOSEATS]{TRAMOSEATS()}}, \code{\link[=REGARIMA]{REGARIMA()}} and \code{\link[=TRAMO]{TRAMO()}}. They can be applied directly on a
+mable. \code{components()} is only available for the seasonal adjustment models
+(\code{\link[=X13]{X13()}} and \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}).
 }
 \examples{
 \dontshow{if (rjd3jars::check_java_version(silent = TRUE)) withAutoprint(\{ # examplesIf}

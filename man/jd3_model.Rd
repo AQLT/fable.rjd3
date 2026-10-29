@@ -10,9 +10,10 @@ jd3_model(x)
 \item{x}{A \code{mdl_ts} (e.g. \code{mb$x13[[1]]}) or a \code{jd3_model}.}
 }
 \value{
-A \code{jd3_model} object: a list holding the decomposition (\code{dable}),
-the series, the final specification, the modelling context and a cache for
-the Java result.
+A \code{jd3_model} object: a list holding the data (a tsibble), the
+series (\code{ts}), the final specification (\code{spec}), the reference
+specification (\code{ref_spec}), the modelling context, the engine, the name of
+the response and a cache for the Java result.
 }
 \description{
 Returns the \code{jd3_model} object stored in a fitted model. It is mostly useful

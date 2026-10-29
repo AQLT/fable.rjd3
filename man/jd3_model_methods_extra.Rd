@@ -82,8 +82,8 @@ mable, a mable.
 }
 }
 \description{
-Methods for models fitted with \code{\link[=X13]{X13()}} or \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}. They can be applied
-directly on a mable.
+Methods for models fitted with \code{\link[=X13]{X13()}}, \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}, \code{\link[=REGARIMA]{REGARIMA()}} or
+\code{\link[=TRAMO]{TRAMO()}}. They can be applied directly on a mable.
 }
 \details{
 \itemize{
@@ -100,7 +100,8 @@ used to fit the model.
 \item \code{refit()} applies the model to new data, using a JDemetra+ refresh policy
 (see \code{\link[rjd3x13:x13_refresh]{rjd3x13::x13_refresh()}} and \code{\link[rjd3tramoseats:tramoseats_refresh]{rjd3tramoseats::tramoseats_refresh()}}):
 the specification is refreshed from the estimated model and the
-reference specification \code{ref_spec}.
+reference specification stored in the model (see the \code{ref_spec} argument
+of \code{\link[=X13]{X13()}}).
 \item \code{stream()} appends new observations to the data of the model and refreshes
 it in the same way. \code{new_data} contains the new observations only.
 }

@@ -19,8 +19,8 @@
 
 # Label of each period of the series, in the format used by JDemetra+ in the
 # names of the outliers: "YYYY-MM" with the FIRST month of the period, for
-# monthly and quarterly series alike (e.g. "1951-01"; third quarter 1950 is
-# "1950-07"). as.Date() of a yearmonth / yearquarter is the first day of the period.
+# all the frequencies alike (e.g. "1951-01"; third quarter 1950 is "1950-07").
+# as.Date() of a yearmonth / yearquarter is the first day of the period.
 #' @keywords internal
 #' @noRd
 jd3_period_label <- function(idx) format(as.Date(idx), "%Y-%m")
@@ -71,7 +71,7 @@ jd3_outlier_table <- function(object) {
         fixed_coeff <-
             fixed_coeff[fixed_coeff$term %in% setdiff(term_glob, term),]
     }
-    if (is.null(fixed_coeff) || is.null(tab)) {
+    if (is.null(fixed_coeff) & is.null(tab)) {
         return (empty)
     }
 
@@ -97,7 +97,8 @@ jd3_outlier_table <- function(object) {
 #' Identify the outliers of a JDemetra+ model
 #'
 #' Returns the outlying observations detected (or specified) in the
-#' pre-adjustment model of a model fitted with [X13()] or [TRAMOSEATS()]:
+#' pre-adjustment model of a model fitted with [X13()], [TRAMOSEATS()],
+#' [REGARIMA()] or [TRAMO()]:
 #' additive outliers (AO), level shifts (LS), transitory changes (TC) and
 #' seasonal outliers (SO). An outlier is dated at one observation, even when
 #' its effect (e.g. a level shift) lasts longer.

@@ -22,8 +22,10 @@ specification object from \code{\link[rjd3tramoseats:tramoseats_spec]{rjd3tramos
 \item{context}{A modelling context created with
 \code{\link[rjd3toolkit:modelling_context]{rjd3toolkit::modelling_context()}} (e.g. for custom calendars), or \code{NULL}.}
 
-\item{ref_spec}{Reference specification: the base specification modifyed by the specials.
-Defaults to \code{spec}.}
+\item{ref_spec}{Reference specification stored in the model: it is the
+reference of the refresh policies used by \code{refit()} and \code{stream()}.
+Defaults to \code{spec}, that is the specification before its modification by
+the specials.}
 
 \item{...}{Currently unused.}
 }
@@ -35,7 +37,7 @@ fitted, the mable column contains a \code{jd3_model} object. Use
 }
 \description{
 Defines a TRAMO-SEATS model to be used inside \code{\link[fabletools:model]{fabletools::model()}}. The
-model is estimated with \code{\link[rjd3tramoseats:.jtramoseats]{rjd3tramoseats::.jtramoseats()}} and the Java result
+model is estimated with \code{rjd3tramoseats::jtramoseats()} and the Java result
 is kept in the fitted model. Arguments and specials are the same as for
 \code{\link[=X13]{X13()}}.
 }
@@ -49,7 +51,7 @@ components(mb)
 # Fit both methods side by side and plot the seasonally adjusted series
 mb <- model(y, x13 = X13(value), ts = TRAMOSEATS(value))
 if (requireNamespace("ggtime", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE)) {
-  autoplot(components(mb))
+  ggplot2::autoplot(components(mb))
 }
 \dontshow{\}) # examplesIf}
 }

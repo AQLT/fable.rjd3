@@ -21,7 +21,7 @@ otherwise. Called through \code{forecast()} on a mable, the result is a fable.
 }
 \description{
 Forecasts the raw series from the pre-adjustment model (RegARIMA / TRAMO)
-of a model fitted with \code{\link[=X13]{X13()}} or \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}. The values are read from
+of a model fitted with \code{\link[=X13]{X13()}}, \code{\link[=TRAMOSEATS]{TRAMOSEATS()}}, \code{\link[=REGARIMA]{REGARIMA()}} or \code{\link[=TRAMO]{TRAMO()}}. The values are read from
 the stored JDemetra+ result, so the seasonal adjustment itself is not
 affected. For the past, see \code{\link[=backast]{backast()}}.
 }

@@ -1,5 +1,5 @@
 # A "step" is a call to a `set_*()` / `add_*()` function of rjd3toolkit
-# (spec -> spec), recorded by a special and applied later in `build_spec()`.
+# (spec -> spec), recorded by a special and applied later in `build_jd3_spec()`.
 #' @keywords internal
 #' @noRd
 rjd3_spec_fun <- function(fn, ...) {
@@ -39,8 +39,11 @@ rjd3_spec_fun <- function(fn, ...) {
 #'   columns of the tsibble and added to the context.
 #'
 #' @section Precedence:
-#' The base `spec` is applied first, then the specials (in the order above,
-#' `jd3()` last), then `xreg()`. Later settings override earlier ones.
+#' The base `spec` is applied first, then the specials in a fixed order (basic,
+#' transform, estimate, automodel, outlier, add_outlier, easter, tradingdays,
+#' arima, ramp, usrdefvar, benchmarking, x11, seats), then `xreg()`. Later
+#' settings override earlier ones. A special that does not apply to the method
+#' (e.g. `x11()` in [TRAMOSEATS()]) is ignored with a warning.
 #'
 #' @name jd3_specials
 #' @seealso [X13()], [TRAMOSEATS()]
@@ -105,8 +108,16 @@ build_jd3_spec <- function(spec, context, specials, y, engine, ref_spec = spec) 
         spec <- specials$spec[[length(specials$spec)]]
     }
     spec_fun <- pkg_fun(engine$spec_fun, engine$pkg)
-    base <- if (is.character(ref_spec)) spec_fun(ref_spec)
-    else ref_spec
+
+    base <- if (is.character(spec)) spec_fun(spec)
+    else spec
+    if (is.null (ref_spec)) {
+        ref_spec <- base
+    } else {
+        ref_spec <- if (is.character(ref_spec)) spec_fun(ref_spec)
+        else ref_spec
+    }
+
 
     steps <- do.call(c, unname(lapply(intersect(.step_order, names(specials)),
                                       function(n) specials[[n]])))
@@ -141,7 +152,7 @@ build_jd3_spec <- function(spec, context, specials, y, engine, ref_spec = spec) 
             }
         }
     }
-    list(spec = spec, context = context, ref_spec = base)
+    list(spec = spec, context = context, ref_spec = ref_spec)
 }
 #' @keywords internal
 #' @noRd

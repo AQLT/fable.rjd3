@@ -16,14 +16,18 @@ X13(
 \item{formula}{Model formula: the name of the variable to adjust (\code{y}), or
 \code{y ~ specials} (see \link{jd3_specials}).}
 
-\item{spec}{Estimate specification: a character name or a
-specification object from \code{\link[rjd3x13:x13_spec]{rjd3x13::x13_spec()}}.}
+\item{spec}{Base specification: a character name (see \code{\link[rjd3x13:x13_spec]{rjd3x13::x13_spec()}}
+for the available names; the default is the first one) or a specification
+object from \code{\link[rjd3x13:x13_spec]{rjd3x13::x13_spec()}}. The specials of the formula are applied
+to it.}
 
 \item{context}{A modelling context created with
 \code{\link[rjd3toolkit:modelling_context]{rjd3toolkit::modelling_context()}} (e.g. for custom calendars), or \code{NULL}.}
 
-\item{ref_spec}{Reference specification: the base specification modifyed by the specials.
-Defaults to \code{spec}.}
+\item{ref_spec}{Reference specification stored in the model: it is the
+reference of the refresh policies used by \code{refit()} and \code{stream()}.
+Defaults to \code{spec}, that is the specification before its modification by
+the specials.}
 
 \item{...}{Currently unused.}
 }
