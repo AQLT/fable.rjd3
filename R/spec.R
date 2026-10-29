@@ -35,8 +35,15 @@ rjd3_spec_fun <- function(fn, ...) {
 #'   decomposition parameters; use with [TRAMOSEATS()] only).
 #' * `benchmarking(...)`: arguments passed to [rjd3toolkit::set_benchmarking()]
 #'   (use with [X13()] or [TRAMOSEATS()] only).
-#' * `xreg(...)`: user-defined regressors taken from
+#' * `xreg(..., regeffect = NULL, group = "r", lag = 0, coef = NULL)`: user-defined regressors taken from
 #'   columns of the tsibble and added to the context.
+#'   By default (`regeffect = NULL`), the regressors are only added to the
+#'   context (with the `group="r"`).
+#'   If `regeffect` is equals to `"Undefined"`, `"Trend"`, `"Seasonal"`, `"Irregular"`,
+#'   `"Series"` or `"SeasonallyAdjusted"` then variable is also added to the specification
+#'   using the [rjd3toolkit::add_usrdefvar()] function with the parameters `lag` and `coeff`.
+#'   If `regeffect = "Calendar"`, then the variable is added to the specification using the
+#'   [rjd3toolkit::set_tradingdays()] function.
 #'
 #' @section Precedence:
 #' The base `spec` is applied first, then the specials in a fixed order (basic,
@@ -66,7 +73,21 @@ specials_rjd3 <- fabletools::new_specials(
     benchmarking = function(...) rjd3_spec_fun("set_benchmarking", ...),
     x11         = function(...) rjd3_spec_fun("set_x11", ...),
     seats       = function(...) rjd3_spec_fun("set_seats", ...),
-    xreg = function(..., regeffect = NULL, group = "r") {
+    xreg = function(..., regeffect = NULL, group = "r",
+                    lag = 0,
+                    coef = NULL
+                    ) {
+        regeffect_values <- c("Undefined", "Trend", "Seasonal", "Irregular", "Series",
+          "SeasonallyAdjusted", "Calendar")
+        if (!is.null(regeffect)) {
+            matched_idx <- which(tolower(regeffect)[1] == tolower(regeffect_values))
+
+            if (length(matched_idx) == 0) {
+                stop(sprintf("Argument 'regeffect' invalid. Accepted values: %s",
+                             paste(regeffect_values, collapse = ", ")))
+            }
+            regeffect <- regeffect_values[matched_idx]
+        }
         ex  <- enexprs(...)
         val <- list(...)
         nm  <- names(ex)
@@ -127,6 +148,7 @@ build_jd3_spec <- function(spec, context, specials, y, engine, ref_spec = spec) 
     }, steps, init = base)
 
     # user-defined regressors
+    first_td <- TRUE
     for (x in specials$xreg) {
         for (nm in names(x$vars)) {
             var <- as_ts_like(x$vars[[nm]], y)
@@ -143,16 +165,47 @@ build_jd3_spec <- function(spec, context, specials, y, engine, ref_spec = spec) 
                 )
             }
             if (!is.null(x$regeffect)) {
-                spec <- remove_usrdefvar(spec, name = nm)
-                spec <- rjd3toolkit::add_usrdefvar(
-                    spec,
-                    group = x$group,
-                    name = nm
+                if (x$regeffect == "Calendar") {
+                    if (first_td) {
+                        name_var <- sprintf("%s.%s", x$group, nm)
+                    } else {
+                        name_var <- c(get_usrdefcal(x$spec),
+                                      name_var)
+                    }
+                    first_td <- FALSE
+
+                    spec <- rjd3toolkit::set_tradingdays(
+                        spec,
+                        option = "UserDefined",
+                        uservariable = name_var,
+                        name = nm
                     )
+                } else {
+                    spec <- remove_usrdefvar(spec, name = nm)
+                    spec <- rjd3toolkit::add_usrdefvar(
+                        spec,
+                        group = x$group,
+                        name = nm,
+                        effect = x$regeffect,
+                        lag = x$lag,
+                        coef = x$coef
+                    )
+                }
             }
         }
     }
     list(spec = spec, context = context, ref_spec = ref_spec)
+}
+#' @keywords internal
+#' @noRd
+get_usrdefcal <- function(spec){
+    if (!is.null(spec$regarima)) {
+        spec <- spec$regarima
+    }
+    if (!is.null(spec$tramo)) {
+        spec <- spec$tramo
+    }
+    spec$regression$td$users
 }
 #' @keywords internal
 #' @noRd
