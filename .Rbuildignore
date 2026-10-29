@@ -61,3 +61,5 @@ cran-comments.md
 
 ^why\.md$
 ^why\.Rmd$
+
+man/figures/logo.R
