@@ -89,7 +89,7 @@ components(mb)
 
 With the `ggtime` package, the decomposition can be plotted with `autoplot()`.
 
-```{r autoplot, eval = has_plot, fig.width = 7, fig.height = 6}
+```{r autoplot, fig.width = 7, fig.height = 6}
 library(ggtime)
 ggplot2::autoplot(components(mb))
 ```
