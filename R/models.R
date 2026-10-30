@@ -1,3 +1,9 @@
+#' @importFrom rjd3x13 jx13 x13_spec x13_refresh
+#' @importFrom rjd3x13 jregarima regarima_spec regarima_refresh
+#' @importFrom rjd3tramoseats jtramoseats tramoseats_spec tramoseats_refresh
+#' @importFrom rjd3tramoseats jtramo tramo_spec tramo_refresh
+#' @keywords internal
+#' @noRd
 .engines <- list(
     X13 = list(
         pkg = "rjd3x13", jfun = "jx13",

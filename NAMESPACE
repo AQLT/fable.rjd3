@@ -79,6 +79,22 @@ importFrom(rjd3jars,
   reload_safactories,
   reload_tsproviders
 )
+importFrom(rjd3tramoseats,
+  jtramo,
+  jtramoseats,
+  tramo_refresh,
+  tramo_spec,
+  tramoseats_refresh,
+  tramoseats_spec
+)
+importFrom(rjd3x13,
+  jregarima,
+  jx13,
+  regarima_refresh,
+  regarima_spec,
+  x13_refresh,
+  x13_spec
+)
 importFrom(rlang,
   ":=",
   abort,
